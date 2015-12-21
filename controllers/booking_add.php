@@ -66,7 +66,7 @@ Alert(GetAlert('success'), 'success');
                             <div class="row da-form-row">
                                 <label class="col-md-2">รหัสบัตรประชาชน <span class="required">*</span></label>
                                 <div class="col-md-5">
-                                    <input class="form-control input-sm" name="id_card" id="id_card" type="text" readonly="" value="<?= isset($_POST['name']) ? $_POST['name'] : '' ?>">
+                                    <input class="form-control input-sm" name="id_card" id="id_card" type="text" readonly="" value="">
                                     <input name="id" id="id" type="hidden">
                                     <p class="help-block"></p>
                                 </div>
@@ -77,7 +77,7 @@ Alert(GetAlert('success'), 'success');
                             <div class="row da-form-row">
                                 <label class="col-md-2">สื่อทัศนวัสดุ <span class="required">*</span></label>
                                 <div class="col-md-5">
-                                    <input class="form-control input-sm" name="id_card" id="id_card" type="text" readonly="" value="<?= isset($_POST['name']) ? $_POST['name'] : '' ?>">
+                                    <input class="form-control input-sm" name="media_id" id="media_id" type="text" readonly="" value="">
                                     <input name="id" id="id" type="hidden">
                                     <p class="help-block"></p>
                                 </div>
