@@ -1,0 +1,31 @@
+<HTML>
+    <HEAD>
+        <TITLE>Stock List</TITLE>
+        <SCRIPT LANGUAGE="JavaScript">
+        
+        function pick(symbol) {
+                if (window.opener && !window.opener.closed){
+                    window.opener.document.stockForm.stockBox.value = symbol;
+                    window.close();
+                   
+                }
+            }
+      
+        </SCRIPT>
+    </HEAD>
+    <BODY>
+        <TABLE BORDER="1" CELLSPACING="0" CELLPADDING="5">
+            <TR BGCOLOR="#cccccc"><TD><B>NYSE</B></TD><TD><B>NASDAQ</B></TD></TR>
+            <TR><TD><A HREF="javascript:pick('AOL')" onclick="pick('AOL')">AOL</A></TD>
+                <TD><A HREF="javascript:pick('CSCO')">CSCO</A></TD></TR>
+            <TR><TD><A HREF="javascript:pick('CPQ')">CPQ</A></TD>
+                <TD><A HREF="javascript:pick('INTC')">INTC</A></TD></TR>
+            <TR><TD><A HREF="javascript:pick('NOK')">NOK</A></TD>
+                <TD><A HREF="javascript:pick('SUNW')">SUNW</A></TD></TR>
+            <TR><TD><A HREF="javascript:pick('LU')">LU</A></TD>
+                <TD><A HREF="javascript:pick('AMZN')">AMZN</A></TD></TR>
+            <TR><TD><A HREF="javascript:pick('T')">T</A></TD>
+                <TD><A HREF="javascript:pick('MSFT')">MSFT</A></TD></TR>
+        </TABLE>
+    </BODY>
+</HTML>
