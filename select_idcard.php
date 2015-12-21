@@ -127,7 +127,7 @@ if ($_SESSION ['user_id'] != "") {
                                                             <td><?= $row['tel'] ?></td>
 
                                                             <td class="center"><?= ShowDateThTime($row['updated_at']) ?></td>
-                                                            <td class="center "><a href="javascript:;" onclick="pick(<?=$row['id_card']?>,<?=$row['id']?>)" class="btn btn-primary btn-small">เลือก</a> 
+                                                            <td class="center "><a href="javascript:;" onclick="pick('<?=$row['id_card']?>','<?=$row['id']?>')" class="btn btn-primary btn-small">เลือก</a> 
 
                                                             </td>
                                                         </tr>
@@ -144,13 +144,7 @@ if ($_SESSION ['user_id'] != "") {
                                         </table>
                                         <div class="row" style="margin-bottom: 20px;">
 
-                                            <div class="col-md-2">
-                                                <select class="form-control input-small" id="bulk-action">
-                                                    <option value="">ตัวเลือก</option>
-                                                    <option value="เลือกทั้งหมด">เลือกทั้งหมด</option>
-                                                    <option value="ยกเลิกเลือกทั้งหมด">ยกเลิกเลือกทั้งหมด</option>
-                                                </select>
-                                            </div>
+                                           
 
                                         </div>
                                     </div>

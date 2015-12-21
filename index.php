@@ -2,7 +2,7 @@
 ob_start();
 session_start();
 include_once './lib/application.php';
-  echo var_dump($_SERVER['REQUEST_URI']);
+
 if ($_COOKIE['user'] == '') {
    // echo $_REQUEST['URI'];
     if($_GET['controllers'] != ''){

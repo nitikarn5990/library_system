@@ -1,5 +1,4 @@
 <?php
-ปปป
 ob_start();
 session_start();
 include_once './lib/application.php';
@@ -64,20 +63,56 @@ if ($_SESSION ['user_id'] != "") {
         <link href="dist/css/custom.css" rel="stylesheet" type="text/css">
         <SCRIPT LANGUAGE="JavaScript">
 
-            function pick(idcard, id) {
+            function picks(media_id, id) {
                 if (window.opener && !window.opener.closed) {
                     //  window.opener.document.stockForm.stockBox.value = symbol;
-                    window.opener.document.getElementById('id_card').value = idcard;
-                    window.opener.document.getElementById('id').value = id;
+
+                    window.opener.document.getElementById('media_id').value = media_id;
+                    window.opener.document.getElementById('media_id').value = id;
                     window.close();
 
                 }
+            }
+            function picks2(html_table,media_id) {
+                if (window.opener && !window.opener.closed) {
+                    //  window.opener.document.stockForm.stockBox.value = symbol;
+
+                    window.opener.document.getElementById('media_id').value = media_id;
+                      window.opener.document.getElementById('media_id').value = media_id;
+                    window.opener.$('#table_media_list').html(html_table);
+                    window.close();
+
+                }
+            }
+            function multi_select() {
+                var _ID = '';
+                $('input.checkboxes[type=checkbox]').each(function () {
+
+                    if ($(this).is(":checked")) {
+                        // $(this).closest('tr').css("background-color","rgba(255, 235, 59, 0.46) !important");
+                        _ID += ',' + $(this).val();
+
+
+                    }
+                });
+
+                $.ajax({
+                    method: "GET",
+                    url: "./ajax/get_media_table.php",
+                    data: {id: _ID.substring(1)}
+                }).success(function (html) {
+                
+                    picks2(html, _ID.substring(1));
+                });
+
+             
             }
 
         </SCRIPT>
     </head>
 
     <body> 
+      
         <div id="wrapper">
             <div id="" style="padding: 15px;">
                 <div class="row">
@@ -87,7 +122,7 @@ if ($_SESSION ['user_id'] != "") {
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
-
+               
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="panel panel-default">
@@ -96,9 +131,8 @@ if ($_SESSION ['user_id'] != "") {
                             </div>
                             <div class="panel-toolbar">
                                 <div class="btn-group"> 
-                                    <a class="btn" href="<?= ADDRESS ?>media_add"><i class="icol-add"></i> เลือก</a> 
+                                    <a class="btn" href="javascript:;" onclick="multi_select()"><i class="icol-add"></i> เลือก</a> 
 
-                                    <a href="javascript:;" onclick="frm_submit()" class="btn" id="btn-select-delete" ><i class="icol-cross"></i> ลบที่เลือก</a> 
                                 </div>
                             </div>
                             <!-- /.panel-heading -->
@@ -117,30 +151,32 @@ if ($_SESSION ['user_id'] != "") {
                                                 </tr>
                                             </thead>
                                             <tbody>
-<?php
-$sql = "SELECT * FROM tb_media";
-$result = mysql_query($sql);
+                                                <?php
+                                                $sql = "SELECT * FROM tb_media";
+                                                $result = mysql_query($sql);
 
-if (mysql_num_rows($result) > 0) {
-    while ($row = mysql_fetch_assoc($result)) {
-        ?>
+                                                if (mysql_num_rows($result) > 0) {
+                                                    while ($row = mysql_fetch_assoc($result)) {
+                                                        ?>
                                                         <tr class="<?= $row['available'] > 0 ? 'success' : 'danger' ?>">
                                                             <td class="center">
-        <?php if ($row['available'] > 0) { ?>
+                                                                <?php if ($row['available'] > 0) { ?>
                                                                     <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()">
                                                                 <?php } ?>
                                                             </td>
                                                             <td class="center"><?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?></td>
-                                                            <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)     ?></td> 
+                                                            <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)       ?></td> 
                                                             <td><?= $row['name'] ?></td>
                                                             <td class="center"><?= $row['available'] ?></td>
 
                                                             <td class="center ">
-        <?php if ($row['available'] > 0) { ?>
-                                                                    <a href="<?= ADDRESS ?>media_edit&id=<?= $row['id'] ?>" class="btn btn-primary btn-small">เลือก</a> 
-                                                                <?php } else {
+                                                                <?php if ($row['available'] > 0) { ?>
+                                                                    <a href="javascript:;" onclick="picks('<?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?>', '<?= $row['id'] ?>')" class="btn btn-primary btn-small">เลือก</a> 
+                                                                    <?php
+                                                                } else {
                                                                     echo 'ไม่ว่าง';
-                                                                } ?>
+                                                                }
+                                                                ?>
                                                             </td>
                                                         </tr>
 
@@ -157,7 +193,7 @@ if (mysql_num_rows($result) > 0) {
                                         <div class="row" style="margin-bottom: 20px;">
 
                                             <div class="col-md-2">
-                                                <select class="form-control input-small" id="bulk-action">
+                                                <select class="form-control input-small" id="bulk-action" style="    width: 190px;">
                                                     <option value="">ตัวเลือก</option>
                                                     <option value="เลือกทั้งหมด">เลือกทั้งหมด</option>
                                                     <option value="ยกเลิกเลือกทั้งหมด">ยกเลิกเลือกทั้งหมด</option>
@@ -195,42 +231,42 @@ if (mysql_num_rows($result) > 0) {
         <script src="./dist/js/sb-admin-2.js"></script>
         <script>
 
-                                                        $('#dataTables-example').dataTable({
-                                                            "aoColumnDefs": [{"bSortable": false, "aTargets": [0]},
-                                                            ]
-                                                        });
+                                                                        $('#dataTables-example').dataTable({
+                                                                            "aoColumnDefs": [{"bSortable": false, "aTargets": [0]},
+                                                                            ]
+                                                                        });
 
-                                                        // Setup - add a text input to each header cell
-                                                        var k = 0;
-                                                        $('#dataTables-example thead th').each(function () {
-                                                            var title = $('#dataTables-example thead th').eq($(this).index()).text();
-                                                            if (k === 0) {
+                                                                        // Setup - add a text input to each header cell
+                                                                        var k = 0;
+                                                                        $('#dataTables-example thead th').each(function () {
+                                                                            var title = $('#dataTables-example thead th').eq($(this).index()).text();
+                                                                            if (k === 0) {
 
-                                                            } else {
-                                                                $(this).html('<input type="text" placeholder="' + title + '" />');
-                                                            }
+                                                                            } else {
+                                                                                $(this).html('<input type="text" placeholder="' + title + '" />');
+                                                                            }
 
 
 
-                                                            k++;
-                                                        });
+                                                                            k++;
+                                                                        });
 
-                                                        // DataTable
-                                                        var table = $('#dataTables-example').DataTable();
+                                                                        // DataTable
+                                                                        var table = $('#dataTables-example').DataTable();
 
-                                                        // Apply the search
-                                                        table.columns().eq(0).each(function (colIdx) {
-                                                            $('input', table.column(colIdx).header()).on('keyup change', function () {
-                                                                table
-                                                                        .column(colIdx)
-                                                                        .search(this.value)
-                                                                        .draw();
-                                                            });
+                                                                        // Apply the search
+                                                                        table.columns().eq(0).each(function (colIdx) {
+                                                                            $('input', table.column(colIdx).header()).on('keyup change', function () {
+                                                                                table
+                                                                                        .column(colIdx)
+                                                                                        .search(this.value)
+                                                                                        .draw();
+                                                                            });
 
-                                                            $('input', table.column(colIdx).header()).on('click', function (e) {
-                                                                e.stopPropagation();
-                                                            });
-                                                        });
+                                                                            $('input', table.column(colIdx).header()).on('click', function (e) {
+                                                                                e.stopPropagation();
+                                                                            });
+                                                                        });
 
 
 
@@ -279,9 +315,13 @@ if (mysql_num_rows($result) > 0) {
         </script>
 
         <style>
+            .center{
+                text-align: center;
+            }
             tr{
                 font-size: 12px;
             }
+            
         </style>
 
     </body>

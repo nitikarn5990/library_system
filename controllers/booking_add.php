@@ -1,35 +1,53 @@
-<script>
-    //localStorage.setItem('url', window.location.href);
 
-</script>
 <?php
 if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช็คว่ามีการกดปุ่ม บันทึกข้อมูล
     //ถ้าว่างทำส่วนนี้ คือ เพิม่ลงฐานข้อมูล
     $data = array(
-        "name" => $_POST['name'], //ชื่อการจอง
-        "category_id" => $_POST['category_id'], //id ประเภทการจอง
-        "detail" => $_POST['detail'], // รายละเอียด
-        "qty" => $_POST['qty'], // จำนวน
-        "days_borrow" => $_POST['days_borrow'], //จำนวนวันที่สามาระยืมได้
-        "cost" => $_POST['cost'], // ราคาการจอง
-        "fine_per_day" => $_POST['fine_per_day'], // ราคาค่าปรับต่อวัน
-        "status" => $_POST['status'], // สถานะ
-        "agent_id" => $_POST['agent_id'], //id ตัวแทนจำหน่าย
+        "people_id" => $_POST['people_id'], //ID สมาชิก
+        "id_card" => $_POST['id_card'], //รหัสบัตรประชาชน
+        "booking_date" => $_POST['booking_date'], //วันที่จอง
+        "status" => 'จองอยู่', // สถานะ
+        "comment" => $_POST['comment'], // สถานะ
         "created_at" => DATE_TIME, //วันที่บันทึก
         "updated_at" => DATE_TIME, //วันที่แก้ไข
     );
 
 // insert ข้อมูลลงในตาราง tb_booking โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
     if (insert("tb_booking", $data)) { // บันทึกข้อมูลลงตาราง tb_booking 
-        //  echo AlertSuccess;
-        SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'booking');
-        die();
-    } else {
-        SetAlert('เกิดข้อผิดพลาดไม่สามารถเพิ่มข้อมูลได้'); //แสดงข้อมูลแจ้งเตือนถ้าไม่สำเร็จ
-        header('location:' . ADDRESS . 'booking_add');
-        die();
+        if ($_POST['media_id'] != '') { //ถ้ามีรหัสสื่อ
+            $arrIDMedia = explode(',', $_POST['media_id']);
+            foreach ($arrIDMedia as $value) {
+                $data = array(
+                    "booking_id" => $value, //รหัสการจอง
+                    "media_id" => $value, //รหัสสื่อ
+                );
+                insert("tb_booking_list", $data);
+            }
+        }
+//        if (insert("tb_booking_list", $data)) {
+//            SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+//            header('location:' . ADDRESS . 'booking');
+//            die();
+//        }
     }
+}
+
+
+if ($_POST['media_id'] != '') {
+//print_r($_POST['media_id']);
+    $all_id = '';
+
+    $arrr = explode(',', $_POST['media_id']);
+
+
+    foreach ($arrr as $v) {
+        if ($_POST['delete_id'] != $v) {
+            $all_id .= ',' . $v;
+            // echo $v;
+        }
+    }
+    $all_id = substr($all_id, 1);
+    // echo $all_id;
 }
 
 // แสดงการแจ้งเตือน
@@ -77,9 +95,16 @@ Alert(GetAlert('success'), 'success');
                             <div class="row da-form-row">
                                 <label class="col-md-2">สื่อทัศนวัสดุ <span class="required">*</span></label>
                                 <div class="col-md-5">
-                                    <input class="form-control input-sm" name="media_id" id="media_id" type="text" readonly="" value="">
-                                    <input name="id" id="id" type="hidden">
+                                    <input type="hidden" name="delete_id" id="delete_id">
+<?php if ($all_id != '') { ?>
+                                        <input class="form-control input-sm " name="media_id" id="media_id" type="text" readonly="" value="<?= $all_id ?>">
+                                    <?php } else { ?>
+                                        <input class="form-control input-sm " name="media_id" id="media_id" type="text" readonly="" value="<?= $_POST['media_id'] ?>">
+
+<?php } ?>
+
                                     <p class="help-block"></p>
+                                    <div id="table_media_list"></div>
                                 </div>
                                 <div class="col-md-2">
                                     <a href="javascript:;" onclick="showMediaList()" class="btn btn-sm btn-primary">เลือก</a>
@@ -117,12 +142,35 @@ Alert(GetAlert('success'), 'success');
 </div>
 <!-- /.col-lg-12 -->
 <SCRIPT LANGUAGE="JavaScript">
+    $(document).ready(function () {
+        $.ajax({
+            method: "GET",
+            url: "./ajax/get_media_table.php",
+            data: {id: $('#media_id').val()}
+        }).success(function (html) {
+            //alert($('#media_id').val());
+            $('#table_media_list').html(html);
+        });
+
+
+    });
+
+
+    function _submit(delete_id) {
+        $("#delete_id").val(delete_id);
+
+        $("form").submit();
+
+
+    }
+
+
 
     function showList() {
         var sList = PopupCenter("select_idcard.php", "list", "900", "400");
 
     }
-     function showMediaList() {
+    function showMediaList() {
         var sList = PopupCenter("media_list.php", "list", "900", "400");
 
     }
@@ -144,6 +192,7 @@ Alert(GetAlert('success'), 'success');
             newWindow.focus();
         }
     }
+
 </SCRIPT>
 <script>
     $('form').validate({
@@ -193,5 +242,10 @@ Alert(GetAlert('success'), 'success');
         }
     });
 
+
+
 </script>
 
+<style>
+    .datagrid table { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 9px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#FFFFFF; font-size: 15px; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }
+</style>
