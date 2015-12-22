@@ -4,7 +4,6 @@ session_start();
 include_once './lib/application.php';
 
 
-
 if ($_COOKIE['user'] == '') {
 
     header('location:login.php?page=select_idcard');
@@ -63,22 +62,38 @@ if ($_SESSION ['user_id'] != "") {
         <link href="dist/css/custom.css" rel="stylesheet" type="text/css">
         <SCRIPT LANGUAGE="JavaScript">
 
-            function picks(media_id, id) {
+            function picks(media_id) {
                 if (window.opener && !window.opener.closed) {
                     //  window.opener.document.stockForm.stockBox.value = symbol;
+                    var get_media_id = $('#get_media_id').val();
+                    if (get_media_id !== '') {
 
-                    window.opener.document.getElementById('media_id').value = media_id;
-                    window.opener.document.getElementById('media_id').value = id;
-                    window.close();
+                        get_media_id = get_media_id + ',' + media_id
+                        //  window.opener.document.getElementById('media_id').value = get_media_id;
+
+                    } else {
+                        // window.opener.document.getElementById('media_id').value = media_id;
+                        get_media_id = media_id;
+                    }
+                    $.ajax({
+                        method: "GET",
+                        url: "./ajax/get_media_table.php",
+                        data: {id: get_media_id}
+                    }).success(function (html) {
+
+                        picks2(html, get_media_id);
+                    });
+
+
 
                 }
             }
-            function picks2(html_table,media_id) {
+            function picks2(html_table, media_id) {
                 if (window.opener && !window.opener.closed) {
                     //  window.opener.document.stockForm.stockBox.value = symbol;
 
                     window.opener.document.getElementById('media_id').value = media_id;
-                      window.opener.document.getElementById('media_id').value = media_id;
+
                     window.opener.$('#table_media_list').html(html_table);
                     window.close();
 
@@ -101,18 +116,18 @@ if ($_SESSION ['user_id'] != "") {
                     url: "./ajax/get_media_table.php",
                     data: {id: _ID.substring(1)}
                 }).success(function (html) {
-                
+
                     picks2(html, _ID.substring(1));
                 });
 
-             
+
             }
 
         </SCRIPT>
     </head>
 
     <body> 
-      
+        <input type="hidden" id="get_media_id" value="<?= $_GET['media_id'] != '' ? $_GET['media_id'] : '' ?>">
         <div id="wrapper">
             <div id="" style="padding: 15px;">
                 <div class="row">
@@ -122,7 +137,7 @@ if ($_SESSION ['user_id'] != "") {
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
-               
+
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="panel panel-default">
@@ -146,7 +161,7 @@ if ($_SESSION ['user_id'] != "") {
                                                     <th>รหัส</th>
                                                     <th>ประเภท</th>
                                                     <th>ชื่อสื่อ</th>
-                                                    <th>คงเหลือ</th>
+                                                    <th>ยังว่างอยู่</th>
                                                     <th>ตัวเลือก</th>
                                                 </tr>
                                             </thead>
@@ -157,21 +172,38 @@ if ($_SESSION ['user_id'] != "") {
 
                                                 if (mysql_num_rows($result) > 0) {
                                                     while ($row = mysql_fetch_assoc($result)) {
+                                                        $classWarning = '';
+                                                        $checked = '';
+                                                        if ($_GET['media_id'] != '') {
+                                                            $arrGetMediaID = explode(',', $_GET['media_id']);
+
+                                                            foreach ($arrGetMediaID as $value) {
+                                                                if ($row['id'] == $value) {
+                                                                    $classWarning = ' warning';
+                                                                    $checked = 'checked';
+                                                                }
+                                                            }
+                                                        }
+                                                        //หาจำนวนที่ยังสามารถให้ยืมได้
+                                                        $sql_count = 'SELECT COUNT(*) as cnt FROM tb_booking_list WHERE status = "จองอยู่" AND media_id= ' . $row['id'];
+                                                        $res_cnt = mysql_query($sql_count);
+                                                        $row_cnt = mysql_fetch_assoc($res_cnt);
+                                                        $available = $row['qty'] - $row_cnt['cnt'];
                                                         ?>
-                                                        <tr class="<?= $row['available'] > 0 ? 'success' : 'danger' ?>">
+                                                        <tr class="<?= $available > 0 ? 'success' : 'danger' ?> <?= $classWarning ?>">
                                                             <td class="center">
-                                                                <?php if ($row['available'] > 0) { ?>
-                                                                    <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()">
+                                                                <?php if ($available > 0) { ?>
+                                                                    <input type="checkbox" name="select_all[]" class="checkboxes" <?= $checked ?> value="<?= $row['id'] ?>" onclick="countSelect()">
                                                                 <?php } ?>
                                                             </td>
                                                             <td class="center"><?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?></td>
-                                                            <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)       ?></td> 
+                                                            <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)               ?></td> 
                                                             <td><?= $row['name'] ?></td>
-                                                            <td class="center"><?= $row['available'] ?></td>
+                                                            <td class="center"><?= $available ?></td>
 
                                                             <td class="center ">
-                                                                <?php if ($row['available'] > 0) { ?>
-                                                                    <a href="javascript:;" onclick="picks('<?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?>', '<?= $row['id'] ?>')" class="btn btn-primary btn-small">เลือก</a> 
+                                                                <?php if ($available > 0) { ?>
+                                                                    <a href="javascript:;" onclick="picks(<?= $row['id'] ?>)" class="btn btn-primary btn-small">เลือก</a> 
                                                                     <?php
                                                                 } else {
                                                                     echo 'ไม่ว่าง';
@@ -190,7 +222,7 @@ if ($_SESSION ['user_id'] != "") {
 
                                             </tbody>
                                         </table>
-                                        <div class="row" style="margin-bottom: 20px;">
+                                        <div class="row hidden" style="margin-bottom: 20px;">
 
                                             <div class="col-md-2">
                                                 <select class="form-control input-small" id="bulk-action" style="    width: 190px;">
@@ -310,7 +342,12 @@ if ($_SESSION ['user_id'] != "") {
                     }
                 });
             }
+            $(document).ready(function () {
+                var get_media_id = $('#get_media_id').val();
+                if (get_media_id !== '') {
 
+                }
+            });
 
         </script>
 
@@ -321,7 +358,7 @@ if ($_SESSION ['user_id'] != "") {
             tr{
                 font-size: 12px;
             }
-            
+
         </style>
 
     </body>

@@ -28,6 +28,110 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
         header('location:' . ADDRESS . 'media_add');
         die();
     }
+    //อัพโหลดภาพ
+       if (isset($_FILES['file_array'])) {
+
+
+            $Allfile = "";
+
+
+            $Allfile_ref = "";
+
+
+            for ($i = 0; $i < count($_FILES['file_array']['tmp_name']); $i++) {
+
+
+                if ($_FILES["file_array"]["name"][$i] != "") {
+
+
+                    unset($arrData['webs_money_image']);
+
+                    $targetPath = "ใใ/";
+
+                    $ext = explode('.', $_FILES['file_array']['name'][$i]);
+                    $extension = $ext[count($ext) - 1];
+                    $rand = mt_rand(1, 100000);
+
+                    $newImage = DATE_TIME_FILE . $rand . "." . $extension;
+
+               //     $newImage = DATE_TIME_FILE . "_" . $_FILES['file_array']['name'][$i];
+
+
+                    $cdir = getcwd(); // Save the current directory
+
+                    chdir($targetPath);
+
+
+                    copy($_FILES['file_array']['tmp_name'][$i], $targetPath . $newImage);
+
+
+                    chdir($cdir); // Restore the old working directory   
+
+
+
+                    $product_files->SetValue('file_name', $newImage);
+
+
+                    if ($_POST['alt_tag'][$i] == '') {
+
+
+
+
+
+                        //$Allfile_ref .= "|_|" . $newImage;
+                        //$product_files->SetValue('file_name', substr($Allfile, 3));
+
+
+                        $product_files->SetValue('alt_tag', $newImage);
+                    } else {
+
+
+                        //$Allfile_ref .= "|_|" .   $functions->seoTitle($_POST['alt_tag'][$i]);
+
+
+                        $product_files->SetValue('alt_tag', $functions->seoTitle($_POST['alt_tag'][$i]));
+                    }
+
+
+                    $product_files->SetValue('product_id', $products->GetPrimary());
+
+
+                    //$product_files->Save();
+
+
+                    if ($product_files->Save()) {
+
+                        //SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ','success');
+
+
+                        $product_files->ResetValues();
+                    } else {
+
+
+                        SetAlert('ไม่สามารถเพิ่ม แก้ไข ข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+                    }
+                }
+            }
+
+
+            if ($_POST['products_file_name_cover'] == '') {
+
+
+                $arrOrder = array(
+                    'products_file_name_cover' => $product_files->getDataDesc("file_name", "product_id = '" . $products->GetPrimary() . "' ORDER BY id ASC LIMIT 0,1"),
+                    'updated_at' => DATE_TIME
+                );
+
+
+                $arrOrderID = array('id' => $products->GetPrimary());
+
+
+
+
+
+                $products->updateSQL($arrOrder, $arrOrderID);
+            }
+        }
 }
 
 // แสดงการแจ้งเตือน

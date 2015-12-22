@@ -19,7 +19,7 @@ if (isset($_POST['select_all'])) {
 }
 
  $_COOKIE['redirect_uri'] = REDIRECT_URI;
-echo $_COOKIE['redirect_uri'];
+
 // แสดงการแจ้งเตือน
 Alert(GetAlert('error'));
 

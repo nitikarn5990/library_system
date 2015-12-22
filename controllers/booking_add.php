@@ -1,62 +1,62 @@
 
 <?php
-
-
 if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช็คว่ามีการกดปุ่ม บันทึกข้อมูล
-    //ถ้าว่างทำส่วนนี้ คือ เพิม่ลงฐานข้อมูล
-    
-    
-    $data = array(
-        "people_id" => $_POST['id'], //ID สมาชิก
-        "id_card" => $_POST['id_card'], //รหัสบัตรประชาชน
-        "booking_date" => DATE, //วันที่จอง
-        "status" => 'จองอยู่', // สถานะ
-        "comment" => $_POST['comment'], // สถานะ
-        "created_at" => DATE_TIME, //วันที่บันทึก
-        "updated_at" => DATE_TIME, //วันที่แก้ไข
-    );
+    if ($_POST['media_id'] == '') {
+        SetAlert('กรุณาเลือกสื่อที่ต้องการจอง'); //แสดงข้อมูลแจ้งเตือน
+    } else {
+        //ถ้าว่างทำส่วนนี้ คือ เพิม่ลงฐานข้อมูล
+        $data = array(
+            "people_id" => $_POST['id'], //ID สมาชิก
+            "id_card" => $_POST['id_card'], //รหัสบัตรประชาชน
+            "booking_date" => DATE, //วันที่จอง
+            "status" => 'จองอยู่', // สถานะ
+            "comment" => $_POST['comment'], // สถานะ
+            "created_at" => DATE_TIME, //วันที่บันทึก
+            "updated_at" => DATE_TIME, //วันที่แก้ไข
+        );
 
 // insert ข้อมูลลงในตาราง tb_booking โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
-    if (insert("tb_booking", $data)) { // บันทึกข้อมูลลงตาราง tb_booking 
-        if ($_POST['media_id'] != '') { //ถ้ามีรหัสสื่อ
-            $arrIDMedia = explode(',', $_POST['media_id']);
-            
-           $booking_id = getDataDescLastID("id", 'tb_booking');
-            foreach ($arrIDMedia as $value) {
-                $data = array(
-                    "booking_id" => $booking_id, //รหัสการจอง
-                    "media_id" => $value, //รหัสสื่อ
-                );
-                insert("tb_booking_list", $data);
+        if (insert("tb_booking", $data)) { // บันทึกข้อมูลลงตาราง tb_booking 
+            if ($_POST['media_id'] != '') { //ถ้ามีรหัสสื่อ
+                $arrIDMedia = explode(',', $_POST['media_id']);
+
+                $booking_id = getDataDescLastID("id", 'tb_booking');
+                foreach ($arrIDMedia as $value) {
+                    $data = array(
+                        "booking_id" => $booking_id, //รหัสการจอง
+                        "media_id" => $value, //รหัสสื่อ
+                        "status" => 'จองอยู่'
+                    );
+                    insert("tb_booking_list", $data);
+                }
             }
+
+            SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+            header('location:' . ADDRESS . 'booking');
+            die();
         }
-      
-        SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'booking');
-        die();
     }
 }
 
 
+//ลบสื่อ
 if ($_POST['media_id'] != '') {
-//print_r($_POST['media_id']);
+
     $all_id = '';
 
     $arrr = explode(',', $_POST['media_id']);
 
-
     foreach ($arrr as $v) {
         if ($_POST['delete_id'] != $v) {
             $all_id .= ',' . $v;
-            // echo $v;
+       
         }
     }
     $all_id = substr($all_id, 1);
-    // echo $all_id;
+
 }
 
 // แสดงการแจ้งเตือน
-
 Alert(GetAlert('error'));
 
 Alert(GetAlert('success'), 'success');
@@ -102,9 +102,9 @@ Alert(GetAlert('success'), 'success');
                                 <div class="col-md-5">
                                     <input type="hidden" name="delete_id" id="delete_id">
                                     <?php if ($all_id != '') { ?>
-                                        <input class="form-control input-sm " name="media_id" id="media_id" type="text" readonly="" value="<?= $all_id ?>">
+                                        <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $all_id ?>">
                                     <?php } else { ?>
-                                        <input class="form-control input-sm " name="media_id" id="media_id" type="text" readonly="" value="<?= $_POST['media_id'] ?>">
+                                        <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $all_id ?>">
 
                                     <?php } ?>
 
@@ -176,7 +176,10 @@ Alert(GetAlert('success'), 'success');
 
     }
     function showMediaList() {
-        var sList = PopupCenter("media_list.php", "list", "900", "400");
+
+
+        var ID = $('#media_id').val();
+        var sList = PopupCenter("media_list.php?media_id=" + ID, "list", "900", "400");
 
     }
 

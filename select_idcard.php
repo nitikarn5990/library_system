@@ -178,7 +178,7 @@ if ($_SESSION ['user_id'] != "") {
         <script>
 
                $('#dataTables-example').dataTable({
-                   "aoColumnDefs": [{"bSortable": false, "aTargets": [0]},
+                   "aoColumnDefs": [{"bSortable": false, "aTargets": []},
                    ]
                });
 
