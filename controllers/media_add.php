@@ -28,13 +28,6 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
     //อัพโหลดภาพ
     if (isset($_FILES['file_array'])) {
 
-
-        $Allfile = "";
-
-
-        $Allfile_ref = "";
-
-
         for ($i = 0; $i < count($_FILES['file_array']['tmp_name']); $i++) {
 
             if ($_FILES["file_array"]["name"][$i] != "") {
@@ -51,24 +44,22 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
 
                 $newImage = DATE_TIME_FILE . $rand . "." . $extension;
 
-                //     $newImage = DATE_TIME_FILE . "_" . $_FILES['file_array']['name'][$i];
-
                 $cdir = getcwd(); // Save the current directory
                 chdir($targetPath);
 
                 move_uploaded_file($_FILES['file_array']['tmp_name'][$i], $targetPath . $newImage);
 
                 chdir($cdir); // Restore the old working directory   
-//                $data = array(
-//                    "image" => $newImage, //ชื่อภาพ
-//                );
-//
-//                if (update('tb_media', $data, 'id = ' . getDataDescLastID('id', 'tb_media'))) {
-//
-//                    SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//                    header('location:' . ADDRESS . 'media');
-//                    die();
-//                }
+                $data = array(
+                    "image" => $newImage, //ชื่อภาพ
+                );
+
+                if (update('tb_media', $data, 'id = ' . getDataDescLastID('id', 'tb_media'))) {
+
+                    SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+                    header('location:' . ADDRESS . 'media');
+                    die();
+                }
             }
         }
     }

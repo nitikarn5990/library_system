@@ -161,6 +161,7 @@ if ($_SESSION ['user_id'] != "") {
                                                     <th>รหัส</th>
                                                     <th>ประเภท</th>
                                                     <th>ชื่อสื่อ</th>
+                                                      <th>ภาพ</th>
                                                     <th>ยังว่างอยู่</th>
                                                     <th>ตัวเลือก</th>
                                                 </tr>
@@ -184,6 +185,8 @@ if ($_SESSION ['user_id'] != "") {
                                                                 }
                                                             }
                                                         }
+                                                           $targetPath = dirname($_SERVER['PHP_SELF']) . '/dist/images/media/' ;
+                                                        
                                                         //หาจำนวนที่ยังสามารถให้ยืมได้
                                                         $sql_count = 'SELECT COUNT(*) as cnt FROM tb_booking_list WHERE status = "จองอยู่" AND media_id= ' . $row['id'];
                                                         $res_cnt = mysql_query($sql_count);
@@ -199,6 +202,7 @@ if ($_SESSION ['user_id'] != "") {
                                                             <td class="center"><?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?></td>
                                                             <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)               ?></td> 
                                                             <td><?= $row['name'] ?></td>
+                                                           <td><img src="<?= $targetPath.$row['image'] ?>" style="width: 75px;"></td>
                                                             <td class="center"><?= $available ?></td>
 
                                                             <td class="center ">

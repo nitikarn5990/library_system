@@ -14,7 +14,7 @@ date_default_timezone_set('Asia/Bangkok');
 define('ADDRESS', 'index.php?controllers=');
 
 define("DATE", date('Y-m-d'));
-
+define("DATE_TIME_FILE", date('YmdHis'));
 
 
 define("DATE_TIME", date('Y-m-d H:i:s'));

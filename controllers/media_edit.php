@@ -22,14 +22,51 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
 // update ข้อมูลลงในตาราง tb_media โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
     if (update("tb_media", $data, "id = " . $_GET['id'])) { //ชื่อตาราง,ข้อมูลจากตัวแปร $data,id ที่จะทำการแก้ไข
         //  echo AlertSuccess;
-        SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+         // SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
         //   header('location:' . ADDRESS . 'media_edit&id=' . $_POST['id'] . $_POST['action'] != '' ? '&action=repassword':''); //กลับยังหน้าแสดงข้อมูล media ทั้งหมด
         //   die();
-    } else {
-        SetAlert('เกิดข้อผิดพลาดไม่สามารถเพิ่มข้อมูลได้'); //แสดงข้อมูลแจ้งเตือนถ้าไม่สำเร็จ
-        header('location:' . ADDRESS . 'media_edit');
-        die();
     }
+    //อัพโหลดภาพ
+    if (isset($_FILES['file_array'])) {
+
+        for ($i = 0; $i < count($_FILES['file_array']['tmp_name']); $i++) {
+
+            if ($_FILES["file_array"]["name"][$i] != "") {
+
+                $rootPath = $_SERVER['DOCUMENT_ROOT'];
+                $thisPath = dirname($_SERVER['PHP_SELF']);
+                $onlyPath = str_replace($rootPath, '', $thisPath);
+
+                $targetPath = $rootPath . '/' . $onlyPath . '/dist/images/media/';
+
+                $ext = explode('.', $_FILES['file_array']['name'][$i]);
+                $extension = $ext[count($ext) - 1];
+                $rand = mt_rand(1, 100000);
+
+                $newImage = DATE_TIME_FILE . $rand . "." . $extension;
+
+                $cdir = getcwd(); // Save the current directory
+                chdir($targetPath);
+
+                move_uploaded_file($_FILES['file_array']['tmp_name'][$i], $targetPath . $newImage);
+
+                chdir($cdir); // Restore the old working directory   
+                $data = array(
+                    "image" => $newImage, //ชื่อภาพ
+                );
+                $oldImage = getDataDesc('image', 'tb_media', 'id = ' . $_GET['id']);
+                if (update('tb_media', $data, 'id = ' . $_GET['id'])) {
+                    @unlink($targetPath.$oldImage); //ลบภาพเก่า
+                  //  SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+                   // header('location:' . ADDRESS . 'media');
+                  //  die();
+                }
+            }
+        }
+    }
+    SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+   // header('location:' . ADDRESS . 'media');
+    //die();
 }
 
 //เช็คค่า id ต้องมีค่า และ ไม่เป็นค่าว่าง และ ต้องเป็นตัวเลขเท่านั้น
@@ -81,7 +118,7 @@ Alert(GetAlert('success'), 'success');
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <form role="form" action="<?= ADDRESS ?>media_edit&id=<?= $_GET['id'] ?>" method="POST">
+                        <form role="form" action="<?= ADDRESS ?>media_edit&id=<?= $_GET['id'] ?>" method="POST" enctype="multipart/form-data">
                             <div class="row da-form-row">
                                 <label class="col-md-2">ชื่อสื่อ <span class="required">*</span></label>
                                 <div class="col-md-10">
@@ -167,6 +204,24 @@ Alert(GetAlert('success'), 'success');
                                     <p class="help-block"></p>
                                 </div>
                             </div>
+
+                            <div class="row da-form-row">
+                                <label class="col-md-2">ภาพที่อัพโหลด</label>
+                                <div class="col-md-10">
+                                    <?php if ($_GET['id'] != '') { ?>
+                                        <img src="<?= './dist/images/media/' . getDataDesc('image', 'tb_media', 'id=' . $_GET['id']) ?>" style="max-width: 100%;" class="img-thumbnail"> 
+                                    <?php } ?>
+                                    <p class="help-block"></p>
+                                </div>
+                            </div>
+                            <div class="row da-form-row">
+                                <label class="col-md-2">อัพโหลดภาพ </label>
+                                <div class="col-md-10">
+                                    <input class="form-control input-sm" name="file_array[]" type="file" value="">
+                                    <p class="help-block"></p>
+                                </div>
+                            </div>
+
                             <div class="row da-form-row">
                                 <label class="col-md-2">สถานะ </label>
                                 <div class="col-md-10">

@@ -62,6 +62,7 @@ Alert(GetAlert('success'), 'success');
                                         <th>รหัส</th>
                                         <th>ประเภท</th>
                                         <th>ชื่อสื่อ</th>
+                                        <th>ภาพ</th>
                                         <th>จำนวน</th>
                                         <th>ราคา</th>
                                         <th>สถานะ</th>
@@ -73,6 +74,8 @@ Alert(GetAlert('success'), 'success');
                                     <?php
                                     $sql = "SELECT * FROM tb_media";
                                     $result = mysql_query($sql);
+                                    
+                                    $targetPath = dirname($_SERVER['PHP_SELF']) . '/dist/images/media/' ;
 
                                     if (mysql_num_rows($result) > 0) {
                                         while ($row = mysql_fetch_assoc($result)) {
@@ -80,8 +83,9 @@ Alert(GetAlert('success'), 'success');
                                             <tr class="">
                                                 <td class="center"> <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()"></td>
                                                 <td class="center"><?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?></td>
-                                                <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)    ?></td> 
+                                                <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)     ?></td> 
                                                 <td><?= $row['name'] ?></td>
+                                                <td><img src="<?= $targetPath.$row['image'] ?>" style="width: 75px;"></td>
                                                 <td class="center"><?= $row['qty'] ?></td>
                                                 <td class="center"><?= $row['cost'] ?></td>
                                                 <td><?= $row['status'] ?></td>
@@ -159,9 +163,9 @@ Alert(GetAlert('success'), 'success');
 
         $('input.checkboxes[type=checkbox]').each(function () {
             if ($(this).is(":checked")) {
-               $(this).closest('tr').css("background-color","rgba(255, 235, 59, 0.46)");
-            }else{
-                $(this).closest('tr').css("background-color","rgba(255, 235, 59, 0)");
+                $(this).closest('tr').css("background-color", "rgba(255, 235, 59, 0.46)");
+            } else {
+                $(this).closest('tr').css("background-color", "rgba(255, 235, 59, 0)");
             }
         });
     }
