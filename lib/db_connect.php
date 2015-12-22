@@ -53,6 +53,28 @@ function getDataDesc($myID ,$myTable, $myWhere) {
         return("");
     }
 }
+function getDataDescLastID($myID ,$myTable) {
+   
+
+    if ($myWhere != "") {
+        $SqlWhere = " WHERE " . $myWhere;
+    }
+
+    if ($myID != "") {
+        $sql = "SELECT $myID FROM " . $myTable. $SqlWhere . ' ORDER BY id DESC LIMIT 1';
+        $Query = mysql_query($sql);
+        $RecordCount = mysql_num_rows($Query);
+
+        if ($RecordCount > 0) {
+            $Row = mysql_fetch_assoc($Query);
+            return($Row["$myID"]);
+        } else {
+            return("");
+        }
+    } else {
+        return("");
+    }
+}
 
 // the where clause is left optional incase the user wants to delete every row!
 function delete($table, $where) {

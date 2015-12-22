@@ -1,11 +1,15 @@
 
 <?php
+
+
 if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช็คว่ามีการกดปุ่ม บันทึกข้อมูล
     //ถ้าว่างทำส่วนนี้ คือ เพิม่ลงฐานข้อมูล
+    
+    
     $data = array(
-        "people_id" => $_POST['people_id'], //ID สมาชิก
+        "people_id" => $_POST['id'], //ID สมาชิก
         "id_card" => $_POST['id_card'], //รหัสบัตรประชาชน
-        "booking_date" => $_POST['booking_date'], //วันที่จอง
+        "booking_date" => DATE, //วันที่จอง
         "status" => 'จองอยู่', // สถานะ
         "comment" => $_POST['comment'], // สถานะ
         "created_at" => DATE_TIME, //วันที่บันทึก
@@ -16,19 +20,20 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
     if (insert("tb_booking", $data)) { // บันทึกข้อมูลลงตาราง tb_booking 
         if ($_POST['media_id'] != '') { //ถ้ามีรหัสสื่อ
             $arrIDMedia = explode(',', $_POST['media_id']);
+            
+           $booking_id = getDataDescLastID("id", 'tb_booking');
             foreach ($arrIDMedia as $value) {
                 $data = array(
-                    "booking_id" => $value, //รหัสการจอง
+                    "booking_id" => $booking_id, //รหัสการจอง
                     "media_id" => $value, //รหัสสื่อ
                 );
                 insert("tb_booking_list", $data);
             }
         }
-//        if (insert("tb_booking_list", $data)) {
-//            SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//            header('location:' . ADDRESS . 'booking');
-//            die();
-//        }
+      
+        SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+        header('location:' . ADDRESS . 'booking');
+        die();
     }
 }
 
@@ -84,8 +89,8 @@ Alert(GetAlert('success'), 'success');
                             <div class="row da-form-row">
                                 <label class="col-md-2">รหัสบัตรประชาชน <span class="required">*</span></label>
                                 <div class="col-md-5">
-                                    <input class="form-control input-sm" name="id_card" id="id_card" type="text" readonly="" value="">
-                                    <input name="id" id="id" type="hidden">
+                                    <input class="form-control input-sm" name="id_card" id="id_card" type="text" readonly="" value="<?= isset($_POST['id_card']) ? $_POST['id_card'] : '' ?>">
+                                    <input name="id" id="id" type="hidden" value="<?= isset($_POST['id']) ? $_POST['id'] : '' ?>">
                                     <p class="help-block"></p>
                                 </div>
                                 <div class="col-md-2">
@@ -96,12 +101,12 @@ Alert(GetAlert('success'), 'success');
                                 <label class="col-md-2">สื่อทัศนวัสดุ <span class="required">*</span></label>
                                 <div class="col-md-5">
                                     <input type="hidden" name="delete_id" id="delete_id">
-<?php if ($all_id != '') { ?>
+                                    <?php if ($all_id != '') { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="text" readonly="" value="<?= $all_id ?>">
                                     <?php } else { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="text" readonly="" value="<?= $_POST['media_id'] ?>">
 
-<?php } ?>
+                                    <?php } ?>
 
                                     <p class="help-block"></p>
                                     <div id="table_media_list"></div>
@@ -143,18 +148,18 @@ Alert(GetAlert('success'), 'success');
 <!-- /.col-lg-12 -->
 <SCRIPT LANGUAGE="JavaScript">
     $(document).ready(function () {
-        $.ajax({
-            method: "GET",
-            url: "./ajax/get_media_table.php",
-            data: {id: $('#media_id').val()}
-        }).success(function (html) {
-            //alert($('#media_id').val());
-            $('#table_media_list').html(html);
-        });
 
-
+        if ($('#media_id').val() != '') {
+            $.ajax({
+                method: "GET",
+                url: "./ajax/get_media_table.php",
+                data: {id: $('#media_id').val()}
+            }).success(function (html) {
+                //alert($('#media_id').val());
+                $('#table_media_list').html(html);
+            });
+        }
     });
-
 
     function _submit(delete_id) {
         $("#delete_id").val(delete_id);
@@ -197,30 +202,11 @@ Alert(GetAlert('success'), 'success');
 <script>
     $('form').validate({
         rules: {
-            name: {
+            media_id: {
                 required: true
             },
-            category_id: {
+            id_card: {
                 required: true,
-            },
-            qty: {
-                required: true,
-                number: true
-            },
-            days_borrow: {
-                required: true,
-                number: true
-            },
-            cost: {
-                required: true,
-                number: true
-            },
-            fine_per_day: {
-                required: true,
-                number: true
-            },
-            agent_id: {
-                required: true
             },
         },
         messages: {
