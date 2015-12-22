@@ -64,12 +64,25 @@ if ($_SESSION ['user_id'] != "") {
         <link href="dist/css/custom.css" rel="stylesheet" type="text/css">
         <SCRIPT LANGUAGE="JavaScript">
 
-            function pick(idcard,id) {
+            function pick_borrow(idcard,id) {
                 if (window.opener && !window.opener.closed) {
                   //  window.opener.document.stockForm.stockBox.value = symbol;
                     window.opener.document.getElementById('id_card').value = idcard ;
                       window.opener.document.getElementById('id').value = id ;
+                     window.opener.loadBooking(id);
                     window.close();
+                    
+
+                }
+            }
+               function pick_booking(idcard,id) {
+                if (window.opener && !window.opener.closed) {
+                  //  window.opener.document.stockForm.stockBox.value = symbol;
+                    window.opener.document.getElementById('id_card').value = idcard ;
+                      window.opener.document.getElementById('id').value = id ;
+                   
+                    window.close();
+                    
 
                 }
             }
@@ -127,7 +140,13 @@ if ($_SESSION ['user_id'] != "") {
                                                             <td><?= $row['tel'] ?></td>
 
                                                             <td class="center"><?= ShowDateThTime($row['updated_at']) ?></td>
-                                                            <td class="center "><a href="javascript:;" onclick="pick('<?=$row['id_card']?>','<?=$row['id']?>')" class="btn btn-primary btn-small">เลือก</a> 
+                                                            <?php if ($_GET['type'] == 'booking') { ?>
+                                                                     <td class="center "><a href="javascript:;" onclick="pick_booking('<?=$row['id_card']?>','<?=$row['id']?>')" class="btn btn-primary btn-small">เลือก</a>    
+                                                             <?php }?>
+                                                             <?php if ($_GET['type'] == 'borrow') { ?>
+                                                                       <td class="center "><a href="javascript:;" onclick="pick_borrow('<?=$row['id_card']?>','<?=$row['id']?>')" class="btn btn-primary btn-small">เลือก</a>    
+                                                           <?php }?>
+                                                            
 
                                                             </td>
                                                         </tr>

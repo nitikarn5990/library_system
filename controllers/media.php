@@ -82,7 +82,7 @@ Alert(GetAlert('success'), 'success');
                                             ?>
                                             <tr class="">
                                                 <td class="center"> <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()"></td>
-                                                <td class="center"><?= padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0') ?></td>
+                                                <td class="center"><?= $row['id']?></td>
                                                 <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)     ?></td> 
                                                 <td><?= $row['name'] ?></td>
                                                 <td><img src="<?= $targetPath.$row['image'] ?>" style="width: 75px;"></td>

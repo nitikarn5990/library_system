@@ -1,53 +1,53 @@
 
 <?php
-//ยกเลิกการจอง
+//ยกเลิกการยืม
 if ($_GET['action'] == 'cancel' && is_numeric($_GET['id']) && $_GET['id'] != '') {
 
-    if (delete("tb_booking", "id = " . $_GET['id'])) {
-        SetAlert('ลบการจองสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'booking');
+    if (delete("tb_borrow", "id = " . $_GET['id'])) {
+        SetAlert('ลบการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+        header('location:' . ADDRESS . 'borrow');
         die();
     }
 
 //
 //    $data = array(
-//        "status" => 'ยกเลิกการจอง', // สถานะ
+//        "status" => 'ยกเลิกการยืม', // สถานะ
 //        "updated_at" => DATE_TIME, //วันที่แก้ไข
 //    );
 //
-//    if (update("tb_booking", $data, "id = " . $_GET['id'])) {
+//    if (update("tb_borrow", $data, "id = " . $_GET['id'])) {
 //
 //        $data2 = array(
-//            "status" => 'ยกเลิกการจอง', // สถานะ
+//            "status" => 'ยกเลิกการยืม', // สถานะ
 //        );
-//        if (update("tb_booking_list", $data2, "booking_id in(" . $_GET['id'] . ")")) {
-//            SetAlert('ยกเลิกการจองสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//            header('location:' . ADDRESS . 'booking');
+//        if (update("tb_borrow_list", $data2, "borrow_id in(" . $_GET['id'] . ")")) {
+//            SetAlert('ยกเลิกการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+//            header('location:' . ADDRESS . 'borrow');
 //            die();
 //        }
 //    }
 }
-//ยกเลิกการจอง(ที่ละหลายแถว)
+//ยกเลิกการยืม(ที่ละหลายแถว)
 if (isset($_POST['select_all'])) {
     $all_id = implode(',', $_POST['select_all']);
 
-    if (delete("tb_booking", "id in(" . $all_id . ")")) {
-        SetAlert('ลบการจองสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'booking');
+    if (delete("tb_borrow", "id in(" . $all_id . ")")) {
+        SetAlert('ลบการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+        header('location:' . ADDRESS . 'borrow');
         die();
     }
 //    $data = array(
-//        "status" => 'ยกเลิกการจอง', // สถานะ
+//        "status" => 'ยกเลิกการยืม', // สถานะ
 //        "updated_at" => DATE_TIME, //วันที่แก้ไข
 //    );
-//    if (update("tb_booking", $data, "id in(" . $all_id . ")")) {
+//    if (update("tb_borrow", $data, "id in(" . $all_id . ")")) {
 //        $data2 = array(
-//            "status" => 'ยกเลิกการจอง', // สถานะ
+//            "status" => 'ยกเลิกการยืม', // สถานะ
 //        );
-//        if (update("tb_booking_list", $data2, "booking_id in(" . $all_id . ")")) {
+//        if (update("tb_borrow_list", $data2, "borrow_id in(" . $all_id . ")")) {
 //
-//            SetAlert('ยกเลิกการจองสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//            header('location:' . ADDRESS . 'booking');
+//            SetAlert('ยกเลิกการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+//            header('location:' . ADDRESS . 'borrow');
 //
 //            die();
 //        }
@@ -61,7 +61,7 @@ Alert(GetAlert('success'), 'success');
 ?>
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">จัดการจองสื่อทัศนวัสดุ</h1>
+        <h1 class="page-header">จัดการยืมสื่อทัศนวัสดุ</h1>
 
     </div>
     <!-- /.col-lg-12 -->
@@ -69,20 +69,20 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            ข้อมูลการจองทั้งหมด
+            ข้อมูลการยืมทั้งหมด
         </p>
     </div>
 </div>
-<form action="" method="POST" id="frm_booking">
+<form action="" method="POST" id="frm_borrow">
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    การจองสื่อทัศนวัสดุ
+                    การยืมสื่อทัศนวัสดุ
                 </div>
                 <div class="panel-toolbar">
                     <div class="btn-group"> 
-                        <a class="btn" href="<?= ADDRESS ?>booking_add"><i class="icol-add"></i> เพิ่มการจอง</a> 
+                        <a class="btn" href="<?= ADDRESS ?>borrow_add"><i class="icol-add"></i> เพิ่มการยืม</a> 
 
                         <a href="javascript:;" onclick="frm_submit()" class="btn" id="btn-select-delete" ><i class="icol-cross"></i> ลบที่เลือก</a> 
                     </div>
@@ -95,7 +95,7 @@ Alert(GetAlert('success'), 'success');
                                 <thead>
                                     <tr>
                                         <th class="center"></th>
-                                        <th>รหัสการจอง</th>
+                                        <th>รหัสการยืม</th>
                                         <th>รหัสบัตรประชาชน</th>
                                         <th>ชื่อ-สกุลผู้จอง</th>
                                         <th>วันที่จอง</th>
@@ -106,13 +106,13 @@ Alert(GetAlert('success'), 'success');
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $sql = "SELECT * FROM tb_booking ORDER BY id DESC";
+                                    $sql = "SELECT * FROM tb_borrow ORDER BY id DESC";
                                     $result = mysql_query($sql);
 
                                     if (mysql_num_rows($result) > 0) {
                                         while ($row = mysql_fetch_assoc($result)) {
                                             $classStatus = 'success';
-                                            if ($row['status'] == 'ยกเลิกการจอง') {
+                                            if ($row['status'] == 'ยกเลิกการยืม') {
                                                 $classStatus = 'danger';
                                             }
                                             ?>
@@ -121,13 +121,13 @@ Alert(GetAlert('success'), 'success');
                                                 <td class="center"><?= $row['id'] ?></td>
                                                 <td><?= $row['id_card'] ?></td>
                                                 <td><?= getDataDesc('first_name', 'tb_people', 'id = ' . $row['people_id']) . ' ' . getDataDesc('last_name', 'tb_people', 'id = ' . $row['people_id']) ?></td> 
-                                                <td><?= $row['booking_date'] ?></td>
+                                                <td><?= $row['borrow_date'] ?></td>
                                                 <td class="center"><?= $row['status'] ?></td>
                                                 <td class="center"><?= $row['updated_at'] ?></td>
-                                                <td class="center "><a href="<?= ADDRESS ?>booking_edit&id=<?= $row['id'] ?>" class="btn btn-primary btn-small">แก้ไข / ดู</a> 
-                                                    <a href="javascript:;" onclick="if (confirm('คุณต้องลบการจองนี้หรือใม่?') == true) {
-                                                                        document.location.href = '<?= ADDRESS ?>booking&id=<?= $row['id'] ?>&action=cancel'
-                                                                    }" class="btn btn-danger btn-small">ลบการจอง</a>
+                                                <td class="center "><a href="<?= ADDRESS ?>borrow_edit&id=<?= $row['id'] ?>" class="btn btn-primary btn-small">แก้ไข / ดู</a> 
+                                                    <a href="javascript:;" onclick="if (confirm('คุณต้องลบการยืมนี้หรือใม่?') == true) {
+                                                                        document.location.href = '<?= ADDRESS ?>borrow&id=<?= $row['id'] ?>&action=cancel'
+                                                                    }" class="btn btn-danger btn-small">ลบการยืม</a>
                                                 </td>
                                             </tr>
 
@@ -164,13 +164,13 @@ Alert(GetAlert('success'), 'success');
 </form>
 <script>
     function frm_submit() {
-        if (confirm("คุณแน่ใจที่จะลบการจอง?")) {
-            $("#frm_booking").submit();
+        if (confirm("คุณแน่ใจที่จะลบการยืม?")) {
+            $("#frm_borrow").submit();
         }
 
 
     }
-
+        
     $("#bulk-action").change(function () {
 
         if ($(this).val() === 'เลือกทั้งหมด') {

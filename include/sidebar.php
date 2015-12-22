@@ -19,7 +19,7 @@
                 <a href="<?=ADDRESS?>booking" class="<?= substr($_GET['controllers'], 0,7) == 'booking' ? 'active':''?>"><i class="fa fa-table fa-fw"></i> ข้อมูลการจอง</a>
             </li>
             <li>
-                <a href="tables.html"><i class="fa fa-table fa-fw"></i> ข้อมูลการยืม</a>
+                <a href="<?=ADDRESS?>borrow" class="<?= substr($_GET['controllers'], 0,6) == 'borrow' ? 'active':''?>"><i class="fa fa-table fa-fw"></i> ข้อมูลการยืม</a>
             </li>
             <li>
                 <a href="tables.html"><i class="fa fa-table fa-fw"></i> ข้อมูลการคืน</a>

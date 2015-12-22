@@ -23,6 +23,7 @@ function padLeft($data, $limit, $value) {
     return str_pad($data, $limit, $value, STR_PAD_LEFT);
 }
 
+
 function ShowDateThTime($myDate) {
     if ($myDate != "0000-00-00 00:00:00") {
         $myTimeArray = explode(" ", $myDate);

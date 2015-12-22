@@ -172,7 +172,7 @@ Alert(GetAlert('success'), 'success');
 
 
     function showList() {
-        var sList = PopupCenter("select_idcard.php", "list", "900", "400");
+        var sList = PopupCenter("select_idcard.php?type=booking", "list", "900", "400");
 
     }
     function showMediaList() {

@@ -49,11 +49,9 @@ if ($_POST['media_id'] != '') {
     foreach ($arrr as $v) {
         if ($_POST['delete_id'] != $v) {
             $all_id .= ',' . $v;
-       
         }
     }
     $all_id = substr($all_id, 1);
-
 }
 
 // แสดงการแจ้งเตือน
@@ -85,7 +83,7 @@ Alert(GetAlert('success'), 'success');
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <form role="form" action="<?= ADDRESS ?>booking_add" method="POST">
+                        <form role="form" action="<?= ADDRESS ?>borrow_add" method="POST">
                             <div class="row da-form-row">
                                 <label class="col-md-2">รหัสบัตรประชาชน <span class="required">*</span></label>
                                 <div class="col-md-5">
@@ -101,15 +99,18 @@ Alert(GetAlert('success'), 'success');
                                 <label class="col-md-2">สื่อทัศนวัสดุ <span class="required">*</span></label>
                                 <div class="col-md-5">
                                     <input type="hidden" name="delete_id" id="delete_id">
-                                    <?php if ($all_id != '') { ?>
+<?php if ($all_id != '') { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $all_id ?>">
                                     <?php } else { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $all_id ?>">
 
-                                    <?php } ?>
+<?php } ?>
 
-                                    <p class="help-block"></p>
-                                    <div id="table_media_list"></div>
+                                    <p class="help-block"> </p>
+                                  
+                                    <div id="table_media_list">
+                                        
+                                    </div>
                                 </div>
                                 <div class="col-md-2">
                                     <a href="javascript:;" onclick="showMediaList()" class="btn btn-sm btn-primary">เลือก</a>
@@ -149,7 +150,7 @@ Alert(GetAlert('success'), 'success');
 <SCRIPT LANGUAGE="JavaScript">
     $(document).ready(function () {
 
-        if ($('#media_id').val() != '') {
+        if ($('#media_id').val() !== '') {
             $.ajax({
                 method: "GET",
                 url: "./ajax/get_media_table.php",
@@ -160,6 +161,23 @@ Alert(GetAlert('success'), 'success');
             });
         }
     });
+    function loadBooking(id) {
+        
+        if (id !== '') {
+            $.ajax({
+                method: "GET",
+                url: "./ajax/get_booking_table.php",
+                data: {id: id}
+            }).success(function (html) {
+             
+                
+                var obj = jQuery.parseJSON(html);
+              //  console.log(obj.media_id);
+                $('#table_media_list').html(obj.html);
+                $('#media_id').val(obj.media_id);
+            });
+        }
+    }
 
     function _submit(delete_id) {
         $("#delete_id").val(delete_id);
@@ -172,7 +190,7 @@ Alert(GetAlert('success'), 'success');
 
 
     function showList() {
-        var sList = PopupCenter("select_idcard.php", "list", "900", "400");
+        var sList = PopupCenter("select_idcard.php?type=borrow", "list", "900", "400");
 
     }
     function showMediaList() {
@@ -236,5 +254,11 @@ Alert(GetAlert('success'), 'success');
 </script>
 
 <style>
+    .date_booking{
+        font-size: 12px;
+        font-weight: bold;
+        background-color: rgba(255, 255, 0, 0.43);
+        padding: 5px;
+    }
     .datagrid table { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 9px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#FFFFFF; font-size: 15px; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }
 </style>

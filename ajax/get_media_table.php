@@ -25,7 +25,7 @@ if ($_GET['id'] != '') {
 
 
         while ($row = mysql_fetch_assoc($result)) {
-            $id = padLeft($row['category_id'], 3, '0') . padLeft($row['id'], 5, '0');
+            $id =  $row['id'];
             $name = $row['name'];
             $_ID = $row['id'];
             $order++;
