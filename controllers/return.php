@@ -1,52 +1,67 @@
 
 <?php
-//ยกเลิกการยืม
-if ($_GET['action'] == 'cancel' && is_numeric($_GET['id']) && $_GET['id'] != '') {
+//ยกเลิกการคืน
+if ($_GET['action'] == 'delete' && is_numeric($_GET['id']) && $_GET['id'] != '') {
 
-    if (delete("tb_borrow", "id = " . $_GET['id'])) {
-        SetAlert('ลบการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'borrow');
-        die();
+    
+    $data = array(
+        "status" => 'ยืม', // สถานะ
+    );
+
+    if (update("tb_borrow", $data, "id = " . $_GET['id'])) {
+        $data = array(
+            "status" => 'ยืม', // สถานะ
+        );
+        if (update("tb_borrow_list", $data, "borrow_id = " . $_GET['id'])) {
+
+            SetAlert('ยกเลิกการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+            header('location:' . ADDRESS . 'return');
+            die();
+        }
     }
-
+//    if (update("tb_borrow", "id = " . $_GET['id'])) {
+//        SetAlert('ลบการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+//        header('location:' . ADDRESS . 'borrow');
+//        die();
+//    }
 //
 //    $data = array(
-//        "status" => 'ยกเลิกการยืม', // สถานะ
+//        "status" => 'ยกเลิกการคืน', // สถานะ
 //        "updated_at" => DATE_TIME, //วันที่แก้ไข
 //    );
 //
 //    if (update("tb_borrow", $data, "id = " . $_GET['id'])) {
 //
 //        $data2 = array(
-//            "status" => 'ยกเลิกการยืม', // สถานะ
+//            "status" => 'ยกเลิกการคืน', // สถานะ
 //        );
 //        if (update("tb_borrow_list", $data2, "borrow_id in(" . $_GET['id'] . ")")) {
-//            SetAlert('ยกเลิกการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+//            SetAlert('ยกเลิกการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
 //            header('location:' . ADDRESS . 'borrow');
 //            die();
 //        }
 //    }
 }
-//ยกเลิกการยืม(ที่ละหลายแถว)
+//ยกเลิกการคืน(ที่ละหลายแถว)
 if (isset($_POST['select_all'])) {
     $all_id = implode(',', $_POST['select_all']);
 
     if (delete("tb_borrow", "id in(" . $all_id . ")")) {
-        SetAlert('ลบการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+        SetAlert('ลบการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
         header('location:' . ADDRESS . 'borrow');
         die();
     }
 //    $data = array(
-//        "status" => 'ยกเลิกการยืม', // สถานะ
+//        "status" => 'ยกเลิกการคืน', // สถานะ
 //        "updated_at" => DATE_TIME, //วันที่แก้ไข
 //    );
 //    if (update("tb_borrow", $data, "id in(" . $all_id . ")")) {
 //        $data2 = array(
-//            "status" => 'ยกเลิกการยืม', // สถานะ
+//            "status" => 'ยกเลิกการคืน', // สถานะ
 //        );
 //        if (update("tb_borrow_list", $data2, "borrow_id in(" . $all_id . ")")) {
 //
-//            SetAlert('ยกเลิกการยืมสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
+//            SetAlert('ยกเลิกการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
 //            header('location:' . ADDRESS . 'borrow');
 //
 //            die();
@@ -61,7 +76,7 @@ Alert(GetAlert('success'), 'success');
 ?>
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">จัดการยืมสื่อทัศนวัสดุ</h1>
+        <h1 class="page-header">จัดการคืนสื่อทัศนวัสดุ</h1>
 
     </div>
     <!-- /.col-lg-12 -->
@@ -69,7 +84,7 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            ข้อมูลการยืมทั้งหมด
+            ข้อมูลการคืนทั้งหมด
         </p>
     </div>
 </div>
@@ -78,11 +93,11 @@ Alert(GetAlert('success'), 'success');
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    การยืมสื่อทัศนวัสดุ
+                    การคืนสื่อทัศนวัสดุ
                 </div>
                 <div class="panel-toolbar">
                     <div class="btn-group"> 
-                        <a class="btn" href="<?= ADDRESS ?>borrow_add"><i class="icol-add"></i> เพิ่มการยืม</a> 
+                        <a class="btn" href="<?= ADDRESS ?>borrow"><i class="icol-add"></i> เพิ่มการคืน</a> 
 
                         <a href="javascript:;" onclick="frm_submit()" class="btn" id="btn-select-delete" ><i class="icol-cross"></i> ลบที่เลือก</a> 
                     </div>
@@ -95,28 +110,32 @@ Alert(GetAlert('success'), 'success');
                                 <thead>
                                     <tr>
                                         <th class="center"></th>
-                                        <th>รหัสการยืม</th>
+                                        <th>รหัสการคืน</th>
                                         <th>รหัสบัตรประชาชน</th>
-                                        <th>ชื่อ-สกุลผู้จอง</th>
+                                        <th>ชื่อ-สกุลผู้ยืม</th>
                                         <th>วันที่ยืม</th>
                                         <th>สถานะ</th>
                                         <th>แก้ไขล่าสุด</th>
                                         <th>ตัวเลือก</th>
-                                          <th>การคืน</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $sql = "SELECT * FROM tb_borrow WHERE status = 'ยืม' ORDER BY id DESC";
+                                    $sql = "SELECT * FROM tb_borrow WHERE status = 'คืนแล้ว' ORDER BY id DESC";
                                     $result = mysql_query($sql);
 
                                     if (mysql_num_rows($result) > 0) {
                                         while ($row = mysql_fetch_assoc($result)) {
                                             $classStatus = 'success';
-                                            if ($row['status'] == 'ยืม') {
+
+                                            //แจ้งสถานะถ้าคืนยังไม่ครบ
+                                            if (getDataCount('borrow_id', 'tb_borrow_list', 'borrow_id=' . $row['id'] . ' AND status ="ยืม"') > 0) {
+                                                $status = 'คืนยังไม่ครบ';
                                                 $classStatus = 'warning';
+                                            } else {
+                                                $status = 'คืนครบแล้ว';
                                             }
-                                           
                                             ?>
                                             <tr class="<?= $classStatus ?>" >
                                                 <td class="center"> <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()"></td>
@@ -124,17 +143,15 @@ Alert(GetAlert('success'), 'success');
                                                 <td><?= $row['id_card'] ?></td>
                                                 <td><?= getDataDesc('first_name', 'tb_people', 'id = ' . $row['people_id']) . ' ' . getDataDesc('last_name', 'tb_people', 'id = ' . $row['people_id']) ?></td> 
                                                 <td><?= $row['borrow_date'] ?></td>
-                                                <td class="center"><?= $row['status'] == 'ยืม' ? 'รอคืน':'คืนแล้ว' ?></td>
+                                                <td class="center"><?= $status ?></td>
                                                 <td class="center"><?= $row['updated_at'] ?></td>
-                                                <td class="center "><a href="<?= ADDRESS ?>borrow_edit&id=<?= $row['id'] ?>" class="btn btn-primary btn-small">แก้ไข / ดู</a> 
-                                                    
-                                                    <a href="javascript:;" onclick="if (confirm('คุณต้องลบการยืมนี้หรือใม่?') == true) {
-                                                                        document.location.href = '<?= ADDRESS ?>borrow&id=<?= $row['id'] ?>&action=cancel'
-                                                                    }" class="btn btn-danger btn-small">ลบการยืม</a>
+                                                <td class="center "><a href="<?= ADDRESS ?>return_edit&id=<?= $row['id'] ?>" class="btn btn-primary btn-small">แก้ไข / ดู</a> 
+
+                                                    <a href="javascript:;" onclick="if (confirm('คุณต้องลบการคืนนี้หรือใม่?') == true) {
+                                                                        document.location.href = '<?= ADDRESS ?>return&id=<?= $row['id'] ?>&action=delete'
+                                                                    }" class="btn btn-danger btn-small">ยกเลิกการคืน</a>
                                                 </td>
-                                                 <td class="center">
-                                                     <a href="<?= ADDRESS ?>return_edit&id=<?= $row['id'] ?>" class="btn btn-success btn-small">คืน</a> 
-                                                 </td>
+
                                             </tr>
 
 
@@ -170,13 +187,13 @@ Alert(GetAlert('success'), 'success');
 </form>
 <script>
     function frm_submit() {
-        if (confirm("คุณแน่ใจที่จะลบการยืม?")) {
+        if (confirm("คุณแน่ใจที่จะลบการคืน?")) {
             $("#frm_borrow").submit();
         }
 
 
     }
-        
+
     $("#bulk-action").change(function () {
 
         if ($(this).val() === 'เลือกทั้งหมด') {

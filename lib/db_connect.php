@@ -31,15 +31,15 @@ function select($sql) {
     return $result;
 }
 
-function getDataDesc($myID ,$myTable, $myWhere) {
-   
+function getDataDesc($myID, $myTable, $myWhere) {
+
 
     if ($myWhere != "") {
         $SqlWhere = " WHERE " . $myWhere;
     }
 
     if ($myID != "") {
-        $sql = "SELECT $myID FROM " . $myTable. $SqlWhere;
+        $sql = "SELECT $myID FROM " . $myTable . $SqlWhere;
         $Query = mysql_query($sql);
         $RecordCount = mysql_num_rows($Query);
 
@@ -53,15 +53,34 @@ function getDataDesc($myID ,$myTable, $myWhere) {
         return("");
     }
 }
-function getDataDescLastID($myID ,$myTable) {
-   
+
+function getDataCount($myID, $myTable, $myWhere) {
+
 
     if ($myWhere != "") {
         $SqlWhere = " WHERE " . $myWhere;
     }
 
     if ($myID != "") {
-        $sql = "SELECT $myID FROM " . $myTable. $SqlWhere . ' ORDER BY id DESC LIMIT 1';
+        $sql = "SELECT $myID FROM " . $myTable . $SqlWhere;
+        $Query = mysql_query($sql);
+        $RecordCount = mysql_num_rows($Query);
+
+        return $RecordCount;
+    } else {
+        return("");
+    }
+}
+
+function getDataDescLastID($myID, $myTable) {
+
+
+    if ($myWhere != "") {
+        $SqlWhere = " WHERE " . $myWhere;
+    }
+
+    if ($myID != "") {
+        $sql = "SELECT $myID FROM " . $myTable . $SqlWhere . ' ORDER BY id DESC LIMIT 1';
         $Query = mysql_query($sql);
         $RecordCount = mysql_num_rows($Query);
 

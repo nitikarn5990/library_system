@@ -48,7 +48,7 @@ if ($_POST['submit_bt'] == 'เข้าระบบ') {
             $_SESSION['username'] = $username; //กำหนด session username
             $_SESSION['name'] = $row['first_name'] . ' ' . $row['last_name']; //กำหนด session name
 
-            $ck_expire_hour = 1; // กำหนดจำนวนชั่วโมง ให้ตัวแปร cookie  
+            $ck_expire_hour = 4; // กำหนดจำนวนชั่วโมง ให้ตัวแปร cookie  
             $ck_expire = time() + ($ck_expire_hour * 60 * 60); // กำหนดเวลาหมดอายุของคุกกี้
 
             setcookie("user", $username, $ck_expire); // set cookie

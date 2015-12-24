@@ -1,38 +1,44 @@
 
 <?php
 if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช็คว่ามีการกดปุ่ม บันทึกข้อมูล
-    if ($_POST['media_id'] == '') {
-        SetAlert('กรุณาเลือกสื่อที่ต้องการจอง'); //แสดงข้อมูลแจ้งเตือน
+    
+    
+    if ($_POST['media_id'] == '') { //ถ้าไม่ได้เลือกสื่อ
+        SetAlert('กรุณาเลือกสื่อที่ต้องการยืม'); //แสดงข้อมูลแจ้งเตือน
     } else {
-        //ถ้าว่างทำส่วนนี้ คือ เพิม่ลงฐานข้อมูล
+        // เพิม่ลงฐานข้อมูล
         $data = array(
             "people_id" => $_POST['id'], //ID สมาชิก
             "id_card" => $_POST['id_card'], //รหัสบัตรประชาชน
-            "booking_date" => DATE, //วันที่จอง
-            "status" => 'จองอยู่', // สถานะ
+            "borrow_date" => DATE, //วันที่ยืม
             "comment" => $_POST['comment'], // สถานะ
             "created_at" => DATE_TIME, //วันที่บันทึก
             "updated_at" => DATE_TIME, //วันที่แก้ไข
+            "staff_id" => $_SESSION['user_id'], //รหัสเจ้าหน้าที่
         );
 
-// insert ข้อมูลลงในตาราง tb_booking โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
-        if (insert("tb_booking", $data)) { // บันทึกข้อมูลลงตาราง tb_booking 
+// insert ข้อมูลลงในตาราง tb_borrow โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
+        if (insert("tb_borrow", $data)) { // บันทึกข้อมูลลงตาราง tb_borrow 
             if ($_POST['media_id'] != '') { //ถ้ามีรหัสสื่อ
                 $arrIDMedia = explode(',', $_POST['media_id']);
 
-                $booking_id = getDataDescLastID("id", 'tb_booking');
+                $borrow_id = getDataDescLastID("id", 'tb_borrow');
                 foreach ($arrIDMedia as $value) {
                     $data = array(
-                        "booking_id" => $booking_id, //รหัสการจอง
+                        "borrow_id" => $borrow_id, //รหัสการยืม
                         "media_id" => $value, //รหัสสื่อ
-                        "status" => 'จองอยู่'
                     );
-                    insert("tb_booking_list", $data);
+                    insert("tb_borrow_list", $data);
                 }
             }
 
+            $dataUpdate = array(
+                "status" => 'มายืมแล้ว', //เปลี่ยนสถานะเป็น มายืมแล้ว เมื่อมีการยืมจากที่เคยจองไว้
+            );
+            update('tb_booking', $dataUpdate, 'id=' . $_POST['id_booking']); //เมื่อทำการยืมแล้วให้ลบข้อมูลที่เคยจองไว้ด้วย
+
             SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-            header('location:' . ADDRESS . 'booking');
+            header('location:' . ADDRESS . 'borrow_add');
             die();
         }
     }
@@ -41,7 +47,8 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
 
 //ลบสื่อ
 if ($_POST['media_id'] != '') {
-
+    print_r($_POST['delete_id']);
+    die();
     $all_id = '';
 
     $arrr = explode(',', $_POST['media_id']);
@@ -61,7 +68,7 @@ Alert(GetAlert('success'), 'success');
 ?>
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">เพิ่มข้อมูลการจอง</h1>
+        <h1 class="page-header">เพิ่มข้อมูลการยืม</h1>
 
     </div>
     <!-- /.col-lg-12 -->
@@ -69,7 +76,7 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            <a href="<?= ADDRESS ?>booking">ข้อมูลการจองทั้งหมด</a>
+            <a href="<?= ADDRESS ?>borrow">ข้อมูลการยืมทั้งหมด</a>
             เพิ่มข้อมูล
         </p>
     </div>
@@ -84,6 +91,7 @@ Alert(GetAlert('success'), 'success');
                 <div class="row">
                     <div class="col-md-12">
                         <form role="form" action="<?= ADDRESS ?>borrow_add" method="POST">
+                            <input type="hidden" name="id_booking" id="id_booking">
                             <div class="row da-form-row">
                                 <label class="col-md-2">รหัสบัตรประชาชน <span class="required">*</span></label>
                                 <div class="col-md-5">
@@ -104,12 +112,12 @@ Alert(GetAlert('success'), 'success');
                                     <?php } else { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $all_id ?>">
 
-<?php } ?>
+                                    <?php } ?>
 
                                     <p class="help-block"> </p>
-                                  
+
                                     <div id="table_media_list">
-                                        
+
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -162,22 +170,26 @@ Alert(GetAlert('success'), 'success');
         }
     });
     function loadBooking(id) {
-        
+
         if (id !== '') {
             $.ajax({
                 method: "GET",
                 url: "./ajax/get_booking_table.php",
                 data: {id: id}
             }).success(function (html) {
-             
-                
+
+
                 var obj = jQuery.parseJSON(html);
-              //  console.log(obj.media_id);
+                //  console.log(obj.media_id);
                 $('#table_media_list').html(obj.html);
                 $('#media_id').val(obj.media_id);
+                $('#id_booking').val(obj.id_booking);
+
+
             });
         }
     }
+
 
     function _submit(delete_id) {
         $("#delete_id").val(delete_id);
@@ -254,6 +266,10 @@ Alert(GetAlert('success'), 'success');
 </script>
 
 <style>
+    .booked{
+        background-color: rgba(255, 255, 0, 0.43);
+    }
+
     .date_booking{
         font-size: 12px;
         font-weight: bold;

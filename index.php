@@ -4,15 +4,15 @@ session_start();
 include_once './lib/application.php';
 
 if ($_COOKIE['user'] == '') {
-   // echo $_REQUEST['URI'];
-    if($_GET['controllers'] != ''){
-        header('location:login.php?controllers='.$_GET['controllers'] );
+    // echo $_REQUEST['URI'];
+    if ($_GET['controllers'] != '') {
+        header('location:login.php?controllers=' . $_GET['controllers']);
         die();
-    }else{
+    } else {
         header('location:login.php');
         die();
     }
-    
+
 //  die();
 }
 if ($_SESSION ['user_id'] != "") {
@@ -88,8 +88,8 @@ if ($_SESSION ['user_id'] != "") {
                     <a class="navbar-brand" href="index.html" style="color: #A51800;">
                         <label> 
                             <b> 
-                                ยินดีต้อนรับ :  <?= $_SESSION['group'] == 'admin' ?'admin': 'เจ้าหน้าที่ | '. $_SESSION['name']?>  
-                            
+                                ยินดีต้อนรับ :  <?= $_SESSION['group'] == 'admin' ? 'admin' : 'เจ้าหน้าที่ | ' . $_SESSION['name'] ?>  
+
                             </b></label>
                     </a>
                 </div>
@@ -97,22 +97,22 @@ if ($_SESSION ['user_id'] != "") {
 
                 <ul class="nav navbar-top-links navbar-right">
                     <li class="dropdown">
-                        <a class="dropdown-toggle"  href="<?= ADDRESS .'staff_edit&id='.$_SESSION['user_id']?>&action=repassword">
+                        <a class="dropdown-toggle"  href="<?= ADDRESS . 'staff_edit&id=' . $_SESSION['user_id'] ?>&action=repassword">
                             <i class="fa fa-user fa-fw"></i> 
                             <?php
                             if ($_SESSION['group'] == 'admin') {
                                 echo "เปลี่ยนรหัสผ่าน";
-                            }else{
+                            } else {
                                 echo "ข้อมูลส่วนตัว";
                             }
                             ?>
-                            
+
                         </a>
 
                         <!-- /.dropdown-messages -->
                     </li>
                     <li class="dropdown">
-                        <a class="dropdown-toggle"  href="<?= ADDRESS ?>logout&page=<?=$_GET['controllers']?>">
+                        <a class="dropdown-toggle"  href="<?= ADDRESS ?>logout&page=<?= $_GET['controllers'] ?>">
                             <i class="fa fa-power-off fa-fw" style="color: #DC4429;"></i> ออกจากระบบ
 
                         </a>
@@ -124,18 +124,18 @@ if ($_SESSION ['user_id'] != "") {
                 </ul>
                 <!-- /.navbar-top-links -->
 
-<?php require './include/sidebar.php'; ?>
+                <?php require './include/sidebar.php'; ?>
                 <!-- /.navbar-static-side -->
             </nav>
 
             <div id="page-wrapper">
-<?php
+                <?php
 //เช็ค url controllers ไม่ใช่ค่าว่าง และ มีไฟล์ที่อยู่ในโฟลเดอร์ controllers อยู่จริง
-if (isset($_GET['controllers']) && file_exists('./controllers/' . $_GET['controllers'] . '.php')) {
+                if (isset($_GET['controllers']) && file_exists('./controllers/' . $_GET['controllers'] . '.php')) {
 
-    include './controllers/' . $_GET['controllers'] . '.php'; // นำไฟล์ที่ได้จาก $_GET['controllers'] มา include
-}
-?>
+                    include './controllers/' . $_GET['controllers'] . '.php'; // นำไฟล์ที่ได้จาก $_GET['controllers'] มา include
+                }
+                ?>
                 <!-- /.row -->
             </div>
             <!-- /#page-wrapper -->
@@ -209,6 +209,16 @@ if (isset($_GET['controllers']) && file_exists('./controllers/' . $_GET['control
         <style>
             tr{
                 font-size: 12px;
+            }
+            bg-danger{
+
+                background-color: rgba(255, 0, 0, 0.17);
+            }
+            bg-success{
+               background-color: rgba(125, 223, 64, 0.17);
+            }
+             bg-warning{
+               background-color: #FFFAD0;
             }
         </style>
     </body>

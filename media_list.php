@@ -80,7 +80,7 @@ if ($_SESSION ['user_id'] != "") {
                         url: "./ajax/get_media_table.php",
                         data: {id: get_media_id}
                     }).success(function (html) {
-
+                       
                         picks2(html, get_media_id);
                     });
 
@@ -187,11 +187,28 @@ if ($_SESSION ['user_id'] != "") {
                                                         }
                                                            $targetPath = dirname($_SERVER['PHP_SELF']) . '/dist/images/media/' ;
                                                         
-                                                        //หาจำนวนที่ยังสามารถให้ยืมได้
-                                                        $sql_count = 'SELECT COUNT(*) as cnt FROM tb_booking_list WHERE status = "จองอยู่" AND media_id= ' . $row['id'];
+                                                         //หาจำนวนสื่อที่ถูกจอง
+                                                        $sql_count = 'SELECT COUNT(*) as cnt FROM tb_booking_list WHERE status="จองอยู่" AND media_id= ' . $row['id']; 
                                                         $res_cnt = mysql_query($sql_count);
                                                         $row_cnt = mysql_fetch_assoc($res_cnt);
-                                                        $available = $row['qty'] - $row_cnt['cnt'];
+                                                        $count_booking = 0;
+                                                        if (mysql_num_rows($res_cnt) > 0) {
+                                                            $count_booking = $row_cnt['cnt']; //หาจำนวนที่ยืม
+                                                        }
+                                                  
+                                                        
+                                                        //หาจำนวนสื่อที่ถูกยืม
+                                                        $sql_count2 = 'SELECT COUNT(*) as cnt FROM tb_borrow_list WHERE status="ยืม" AND media_id= ' . $row['id']; 
+                                                        $res_cnt2 = mysql_query($sql_count2);
+                                                        $row_cnt2 = mysql_fetch_assoc($res_cnt2);
+                                                        $count_borrow = 0;
+                                                        if (mysql_num_rows($res_cnt2) > 0) {
+                                                                $count_borrow = $row_cnt2['cnt']; //หาจำนวนที่ยืม
+                                                        }
+                                                    
+                                                        
+                                                        //สื่อคงเหลือ
+                                                        $available = $row['qty'] - ($count_booking+$count_borrow);
                                                         ?>
                                                         <tr class="<?= $available > 0 ? 'success' : 'danger' ?> <?= $classWarning ?>">
                                                             <td class="center">

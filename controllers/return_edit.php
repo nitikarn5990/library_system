@@ -1,43 +1,30 @@
 
 <?php
 if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช็คว่ามีการกดปุ่ม บันทึกข้อมูล
-    if ($_POST['media_id'] == '') {
-        SetAlert('กรุณาเลือกสื่อที่ต้องการยืม'); //แสดงข้อมูลแจ้งเตือน
-    } else {
-        //ถ้าว่างทำส่วนนี้ คือ เพิม่ลงฐานข้อมูล
-        $data = array(
-            "people_id" => $_POST['id'], //ID สมาชิก
-            "id_card" => $_POST['id_card'], //รหัสบัตรประชาชน
-           // "borrow_date" => DATE, //วันที่จอง
-           // "status" => 'จองอยู่', // สถานะ
-            "comment" => $_POST['comment'], // สถานะ
-           // "created_at" => DATE_TIME, //วันที่บันทึก
-            "updated_at" => DATE_TIME, //วันที่แก้ไข
-        );
+    if (isset($_POST['cbox_return'])) {
 
-// insert ข้อมูลลงในตาราง tb_borrow โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
-        if (update("tb_borrow", $data,'id = '.$_GET['id'])) { // บันทึกข้อมูลลงตาราง tb_borrow 
-            if ($_POST['media_id'] != '') { //ถ้ามีรหัสสื่อ
+        foreach ($_POST['cbox_return'] as $media_id_return) {
+            $data = array(
+                "status" => 'คืน',
+            );
+            update('tb_borrow_list', $data, 'borrow_id =' . $_GET['id'] . ' AND media_id =' . $media_id_return);
+            $sql_find_all_return = 'SELECT * FROM tb_borrow_list WHERE status = "ยืม" AND borrow_id = ' . $_GET['id'] . ' AND media_id =' . $media_id_return;
+            $result = mysql_query($sql_find_all_return);
+            if (mysql_num_rows($result) == 0) { //ถ้าคืนครบทุกอันให้อัพเดรตสถานะเป็น 'คืนแล้ว'
+                $data = array(
+                    "status" => 'คืนแล้ว',
                 
-                $arrIDMedia = explode(',', $_POST['media_id']);
-
-                 delete('tb_borrow_list', 'borrow_id = '.$_GET['id']);
-                foreach ($arrIDMedia as $value) {
-                    $data = array(
-                        "borrow_id" => $_GET['id'], //รหัสการยืม
-                        "media_id" => $value, //รหัสสื่อ
-                   
-                    );
-                   
-                    insert("tb_borrow_list", $data);
-                }
+                );
+                update('tb_borrow', $data, 'id =' . $_GET['id']);
             }
-
-            SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-            header('location:' . ADDRESS . 'borrow');
-            die();
         }
     }
+    //อัพเดรต comment_return
+    $data = array(
+        "comment_return" => $_POST['comment_return']
+    );
+    update('tb_borrow', $data, 'id =' . $_GET['id']);
+
 }
 //ดึงข้อมูลตาม ID จาก $_GET['id'] ตาราง tb_borrow
 if (isset($_GET['id']) && $_GET['id'] != '' && is_numeric($_GET['id'])) {
@@ -54,31 +41,27 @@ if (isset($_GET['id']) && $_GET['id'] != '' && is_numeric($_GET['id'])) {
         $result2 = mysql_query($sql2);
         $num_row2 = mysql_num_rows($result2);
         if ($num_row2 > 0) {
-           
-             while ( $row2 = mysql_fetch_assoc($result2)){
-                  $allID .= ',' .  $row2['media_id'];
-             }
-            
-         $allID = substr($allID, 1);
-         
+
+            while ($row2 = mysql_fetch_assoc($result2)) {
+                $allID .= ',' . $row2['media_id'];
+            }
+
+            $allID = substr($allID, 1);
         }
     }
 }
 
 
-//ลบสื่อ
-if ($_POST['media_id'] != '') {
 
-    $allID = '';
+if ($_POST['media_id_cancelReturn'] != '') {
+    //ยกเลิกการคืนสื่อ
 
-    $arrr = explode(',', $_POST['media_id']);
-
-    foreach ($arrr as $v) {
-        if ($_POST['delete_id'] != $v) {
-            $allID .= ',' . $v;
-        }
+    $data = array(
+        "status" => 'ยืม',
+    );
+    if (update('tb_borrow_list', $data, 'borrow_id =' . $_GET['id'] . ' AND media_id =' . $_POST['media_id_cancelReturn'])) {
+        SetAlert('ยกเลิกการคืน สำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
     }
-    $allID = substr($allID, 1);
 }
 
 // แสดงการแจ้งเตือน
@@ -88,7 +71,7 @@ Alert(GetAlert('success'), 'success');
 ?>
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">แก้ไขข้อมูลการยืม</h1>
+        <h1 class="page-header">ข้อมูลการยืม</h1>
 
     </div>
     <!-- /.col-lg-12 -->
@@ -96,8 +79,8 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            <a href="<?= ADDRESS ?>borrow">ข้อมูลการยืมทั้งหมด</a>
-            แก้ไขข้อมูล
+            <a href="<?= ADDRESS ?>return">ข้อมูลการคืนทั้งหมด</a>
+            ทำการคืน
         </p>
     </div>
 </div>
@@ -105,12 +88,15 @@ Alert(GetAlert('success'), 'success');
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <i class="icol-add"></i> แก้ไขข้อมูล
+                <i class="icol-add"></i> ทำการคืน
             </div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <form role="form" action="<?= ADDRESS ?>borrow_edit&id=<?=$_GET['id']?>" method="POST">
+                        <form role="form" action="<?= ADDRESS ?>return_edit&id=<?= $_GET['id'] ?>" method="POST">
+                            <input type="hidden" name="borrow_id" id="borrow_id" value="<?= $_GET['id'] ?>">
+                            <input type="hidden" name="media_id_cancelReturn" id="media_id_cancelReturn" value="">
+
                             <div class="row da-form-row">
                                 <label class="col-md-2">รหัสบัตรประชาชน <span class="required">*</span></label>
                                 <div class="col-md-5">
@@ -118,25 +104,25 @@ Alert(GetAlert('success'), 'success');
                                     <input name="id" id="id" type="hidden" value="<?= isset($_POST['id']) ? $_POST['id'] : $row['people_id'] ?>">
                                     <p class="help-block"></p>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 hidden">
                                     <a href="javascript:;" onclick="showList()" class="btn btn-sm btn-primary">เลือก</a>
                                 </div>
                             </div>
                             <div class="row da-form-row">
-                                <label class="col-md-2">สื่อทัศนวัสดุ <span class="required">*</span></label>
-                                <div class="col-md-5">
+                                <label class="col-md-2">สื่อทัศนวัสดุที่ยืม <span class="required">*</span></label>
+                                <div class="col-md-8">
                                     <input type="hidden" name="delete_id" id="delete_id">
-                                    <?php if ($allID != '') { ?>
+<?php if ($allID != '') { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $allID ?>">
                                     <?php } else { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $allID ?>">
 
-                                    <?php } ?>
+<?php } ?>
 
                                     <p class="help-block"></p>
                                     <div id="table_media_list"></div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 hidden">
                                     <a href="javascript:;" onclick="showMediaList()" class="btn btn-sm btn-primary">เลือก</a>
                                 </div>
                             </div>
@@ -144,7 +130,7 @@ Alert(GetAlert('success'), 'success');
                             <div class="row da-form-row">
                                 <label class="col-md-2">หมายเหตุ </label>
                                 <div class="col-md-10">
-                                    <textarea class="form-control" name="comment"><?= isset($row['comment']) ? $row['comment'] : '' ?></textarea>
+                                    <textarea class="form-control" name="comment_return"><?= isset($row['comment_return']) ? $row['comment_return'] : '' ?></textarea>
                                     <p class="help-block"></p>
                                 </div>
                             </div>
@@ -178,7 +164,12 @@ Alert(GetAlert('success'), 'success');
             $.ajax({
                 method: "GET",
                 url: "./ajax/get_media_table.php",
-                data: {id: $('#media_id').val()}
+                data: {
+                    id: $('#media_id').val(),
+                    action: 'return',
+                    borrow_id: $('#borrow_id').val()
+
+                }
             }).success(function (html) {
 
                 $('#table_media_list').html(html);
@@ -188,6 +179,13 @@ Alert(GetAlert('success'), 'success');
 
     function _submit(delete_id) {
         $("#delete_id").val(delete_id);
+
+        $("form").submit();
+
+
+    }
+    function xx(id) {
+        $("#media_id_cancelReturn").val(id);
 
         $("form").submit();
 
@@ -225,6 +223,23 @@ Alert(GetAlert('success'), 'success');
             newWindow.focus();
         }
     }
+    function chk_all_return() {
+
+
+        if ($(".chk_all_return").is(':checked')) {
+            $(".cbox_return").each(function () {
+
+                $(this).prop("checked", true);
+            });
+        } else {
+            $(".cbox_return").each(function () {
+
+                $(this).prop("checked", false);
+            });
+        }
+
+
+    }
 
 </SCRIPT>
 <script>
@@ -261,5 +276,11 @@ Alert(GetAlert('success'), 'success');
 </script>
 
 <style>
+    .txt-nav-return{
+
+        font-size: 13px;
+
+        padding-top: 5px;
+    }
     .datagrid table { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid table td, .datagrid table th { padding: 3px 9px; }.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#FFFFFF; font-size: 15px; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid table thead th:first-child { border: none; }.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }.datagrid table tbody tr:last-child td { border-bottom: none; }
 </style>
