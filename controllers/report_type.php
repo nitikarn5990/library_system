@@ -1,174 +1,64 @@
-<?php
-//ตรวจสอบถ้ามีการลบข้อมูล (ลบที่ละแถว)
-if ($_GET['action'] == 'del' && is_numeric($_GET['id']) && $_GET['id'] != '') {
 
-    if (delete("tb_media", "id = " . $_GET['id'])) {
-        SetAlert('ลบข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'media');
-        die();
-    }
-}
-//ตรวจสอบถ้ามีการลบข้อมูล (ลบที่ละหลายแถว)
-if (isset($_POST['select_all'])) {
-    $all_id = implode(',', $_POST['select_all']);
-    if (delete("tb_media", "id in(" . $all_id . ")")) {
-        SetAlert('ลบข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-        header('location:' . ADDRESS . 'media');
-        die();
-    }
-}
-
-// แสดงการแจ้งเตือน
-Alert(GetAlert('error'));
-
-Alert(GetAlert('success'), 'success');
-?>
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">จัดการสื่อทัศนวัสดุ</h1>
+    <div class="col-md-12" style="margin-bottom: 10px;">
+        <h1 class="center">รายงาน</h1>
+    </div>
+    <div class="col-md-12" style="margin-bottom: 10px;">
+        <a href="<?=ADDRESS?>report_borrow" class="btn btn-default " style="width: 100%;padding: 20px;font-size: 20px;">รายงานจำนวนสื่อที่มีการยืมในแต่ละช่วงเวลา</a>
+
+    </div>
+    <div class="col-md-12" style="margin-bottom: 10px;">
+        <a href="<?=ADDRESS?>report_borrow_total_use" class="btn btn-default " style="width: 100%;padding: 20px;font-size: 20px;">รายงานจำนวนการใช้งานของแต่ละประเภท</a>
+
+
+    </div>
+    <div class="col-md-12" style="margin-bottom: 10px;">
+        <a href="<?=ADDRESS?>report_borrow_return" class="btn btn-default " style="width: 100%;padding: 20px;font-size: 20px;">รายงานสรุปการใช้งานยืม/คืน ตามระยะเวลา</a>
+
 
     </div>
     <!-- /.col-lg-12 -->
 </div>
-<div class="row">
-    <div class="col-lg-12">
-        <p id="breadcrumb">
-            จัดการสื่อทัศนวัสดุ
-        </p>
-    </div>
-</div>
-<form action="" method="POST" id="frm_media">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    สื่อทัศนวัสดุ
-                </div>
-                <div class="panel-toolbar">
-                    <div class="btn-group"> 
-                        <a class="btn" href="<?= ADDRESS ?>media_add"><i class="icol-add"></i> เพิ่มข้อมูล</a> 
-
-                        <a href="javascript:;" onclick="frm_submit()" class="btn" id="btn-select-delete" ><i class="icol-cross"></i> ลบที่เลือก</a> 
-                    </div>
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body" style="padding-top: 15px;">
-                    <div class="table-responsive">
-                        <div class="dataTable_wrapper">
-                            <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-                                <thead>
-                                    <tr>
-                                        <th class="center"></th>
-                                        <th>รหัส</th>
-                                        <th>ประเภท</th>
-                                        <th>ชื่อสื่อ</th>
-                                        <th>ภาพ</th>
-                                        <th>จำนวน</th>
-                                        <th>ราคา</th>
-                                        <th>สถานะ</th>
-                                        <th>แก้ไขล่าสุด</th>
-                                        <th>ตัวเลือก</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $sql = "SELECT * FROM tb_media";
-                                    $result = mysql_query($sql);
-                                    
-                                    $targetPath = dirname($_SERVER['PHP_SELF']) . '/dist/images/media/' ;
-
-                                    if (mysql_num_rows($result) > 0) {
-                                        while ($row = mysql_fetch_assoc($result)) {
-                                            ?>
-                                            <tr class="">
-                                                <td class="center"> <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()"></td>
-                                                <td class="center"><?= $row['id']?></td>
-                                                <td><?= getDataDesc('name', 'tb_category', 'id = ' . $row['category_id']) //เรียกใช่ฟังชั่น 1)ชื่อฟิลด์ 2)ชื่อตาราง 3)where (เงื่อนไข)     ?></td> 
-                                                <td><?= $row['name'] ?></td>
-                                                <td><img src="<?= $targetPath.$row['image'] ?>" style="width: 75px;"></td>
-                                                <td class="center"><?= $row['qty'] ?></td>
-                                                <td class="center"><?= $row['cost'] ?></td>
-                                                <td><?= $row['status'] ?></td>
-                                                <td class="center"><?= ShowDateThTime($row['updated_at']) ?></td>
-                                                <td class="center "><a href="<?= ADDRESS ?>media_edit&id=<?= $row['id'] ?>" class="btn btn-primary btn-small">แก้ไข / ดู</a> <a href="javascript:;" onclick="if (confirm('คุณต้องการลบข้อมูลนี้หรือใม่?') == true) {
-                                                                    document.location.href = '<?= ADDRESS ?>media&id=<?= $row['id'] ?>&action=del'
-                                                                }" class="btn btn-danger btn-small">ลบ</a></td>
-                                            </tr>
-
-
-                                            <?php
-                                        }
-                                    }
-                                    ?>
-
-
-
-                                </tbody>
-                            </table>
-                            <div class="row" style="margin-bottom: 20px;">
-
-                                <div class="col-md-2">
-                                    <select class="form-control input-small" id="bulk-action">
-                                        <option value="">ตัวเลือก</option>
-                                        <option value="เลือกทั้งหมด">เลือกทั้งหมด</option>
-                                        <option value="ยกเลิกเลือกทั้งหมด">ยกเลิกเลือกทั้งหมด</option>
-                                    </select>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- /.panel-body -->
-            </div>
-            <!-- /.panel -->
-        </div>
-        <!-- /.col-lg-12 -->
-    </div>
-</form>
-<script>
-    function frm_submit() {
-        if (confirm("คุณแน่ใจที่จะลบ?")) {
-            $("#frm_media").submit();
-        }
-
-
+<style>
+    .myButton {
+        -moz-box-shadow: 0px 1px 0px 0px #f0f7fa;
+        -webkit-box-shadow: 0px 1px 0px 0px #f0f7fa;
+        box-shadow: 0px 1px 0px 0px #f0f7fa;
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #33bdef), color-stop(1, #019ad2));
+        background:-moz-linear-gradient(top, #33bdef 5%, #019ad2 100%);
+        background:-webkit-linear-gradient(top, #33bdef 5%, #019ad2 100%);
+        background:-o-linear-gradient(top, #33bdef 5%, #019ad2 100%);
+        background:-ms-linear-gradient(top, #33bdef 5%, #019ad2 100%);
+        background:linear-gradient(to bottom, #33bdef 5%, #019ad2 100%);
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#33bdef', endColorstr='#019ad2',GradientType=0);
+        background-color:#33bdef;
+        -moz-border-radius:6px;
+        -webkit-border-radius:6px;
+        border-radius:6px;
+        border:1px solid #057fd0;
+        display:inline-block;
+        cursor:pointer;
+        color:#ffffff;
+        font-family:Arial;
+        font-size:15px;
+        font-weight:bold;
+        padding:6px 24px;
+        text-decoration:none;
+        text-shadow:0px -1px 0px #5b6178;
+    }
+    .myButton:hover {
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #019ad2), color-stop(1, #33bdef));
+        background:-moz-linear-gradient(top, #019ad2 5%, #33bdef 100%);
+        background:-webkit-linear-gradient(top, #019ad2 5%, #33bdef 100%);
+        background:-o-linear-gradient(top, #019ad2 5%, #33bdef 100%);
+        background:-ms-linear-gradient(top, #019ad2 5%, #33bdef 100%);
+        background:linear-gradient(to bottom, #019ad2 5%, #33bdef 100%);
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#019ad2', endColorstr='#33bdef',GradientType=0);
+        background-color:#019ad2;
+    }
+    .myButton:active {
+        position:relative;
+        top:1px;
     }
 
-    $("#bulk-action").change(function () {
-
-        if ($(this).val() === 'เลือกทั้งหมด') {
-            $(".checkboxes").each(function () {
-
-                $(this).prop("checked", true);
-            });
-        }
-        if ($(this).val() === 'ยกเลิกเลือกทั้งหมด') {
-            $(".checkboxes").each(function () {
-                $(this).prop("checked", false);
-            });
-        }
-        countSelect();
-    });
-    $('#btn-select-delete').hide();
-    function countSelect() {
-        var len = $('.checkboxes:checked').length;
-        if (len === 0) {
-            $('#btn-select-delete').hide();
-        } else {
-            $('#btn-select-delete').show();
-        }
-
-        $('input.checkboxes[type=checkbox]').each(function () {
-            if ($(this).is(":checked")) {
-                $(this).closest('tr').css("background-color", "rgba(255, 235, 59, 0.46)");
-            } else {
-                $(this).closest('tr').css("background-color", "rgba(255, 235, 59, 0)");
-            }
-        });
-    }
-
-
-</script>
+</style>

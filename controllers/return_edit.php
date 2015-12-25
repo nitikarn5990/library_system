@@ -6,6 +6,7 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
         foreach ($_POST['cbox_return'] as $media_id_return) {
             $data = array(
                 "status" => 'คืน',
+                "return_date" => DATE,
             );
             update('tb_borrow_list', $data, 'borrow_id =' . $_GET['id'] . ' AND media_id =' . $media_id_return);
             $sql_find_all_return = 'SELECT * FROM tb_borrow_list WHERE status = "ยืม" AND borrow_id = ' . $_GET['id'] . ' AND media_id =' . $media_id_return;
@@ -13,18 +14,19 @@ if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช�
             if (mysql_num_rows($result) == 0) { //ถ้าคืนครบทุกอันให้อัพเดรตสถานะเป็น 'คืนแล้ว'
                 $data = array(
                     "status" => 'คืนแล้ว',
-                
                 );
                 update('tb_borrow', $data, 'id =' . $_GET['id']);
             }
         }
     }
-    //อัพเดรต comment_return
-    $data = array(
-        "comment_return" => $_POST['comment_return']
-    );
-    update('tb_borrow', $data, 'id =' . $_GET['id']);
 
+
+
+
+    // $data = array(
+    //    "comment_return" => $_POST['comment_return']
+    // );
+    // update('tb_borrow', $data, 'id =' . $_GET['id']);
 }
 //ดึงข้อมูลตาม ID จาก $_GET['id'] ตาราง tb_borrow
 if (isset($_GET['id']) && $_GET['id'] != '' && is_numeric($_GET['id'])) {
@@ -49,17 +51,28 @@ if (isset($_GET['id']) && $_GET['id'] != '' && is_numeric($_GET['id'])) {
             $allID = substr($allID, 1);
         }
     }
-}
 
 
 
-if ($_POST['media_id_cancelReturn'] != '') {
-    //ยกเลิกการคืนสื่อ
 
-    $data = array(
-        "status" => 'ยืม',
-    );
-    if (update('tb_borrow_list', $data, 'borrow_id =' . $_GET['id'] . ' AND media_id =' . $_POST['media_id_cancelReturn'])) {
+
+    if ($_POST['media_id_cancelReturn'] != '') {
+        //ยกเลิกการคืนสื่อ
+
+        $data = array(
+            "status" => 'ยืม',
+            "return_date" => '',
+        );
+        if (update('tb_borrow_list', $data, 'borrow_id =' . $_GET['id'] . ' AND media_id =' . $_POST['media_id_cancelReturn'])) {
+
+            //ถ้าสถานะเป็น ยืมหมด จะไปอยู่ที่รายการยืม แต่ถ้า คืนมาบางส่วนจะอยู่ในส่วน ของรายการคืน
+            if (getDataCount('borrow_id', 'tb_borrow_list', 'status="คืน" AND borrow_id=' . $_GET['id']) == 0) {
+                $data = array(
+                    "status" => 'ยืม',
+                );
+                update('tb_borrow', $data, 'id =' . $_GET['id']);
+            }
+        }
         SetAlert('ยกเลิกการคืน สำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
     }
 }
@@ -104,20 +117,19 @@ Alert(GetAlert('success'), 'success');
                                     <input name="id" id="id" type="hidden" value="<?= isset($_POST['id']) ? $_POST['id'] : $row['people_id'] ?>">
                                     <p class="help-block"></p>
                                 </div>
-                                <div class="col-md-2 hidden">
-                                    <a href="javascript:;" onclick="showList()" class="btn btn-sm btn-primary">เลือก</a>
-                                </div>
+
                             </div>
+
                             <div class="row da-form-row">
                                 <label class="col-md-2">สื่อทัศนวัสดุที่ยืม <span class="required">*</span></label>
-                                <div class="col-md-8">
+                                <div class="col-md-10">
                                     <input type="hidden" name="delete_id" id="delete_id">
-<?php if ($allID != '') { ?>
+                                    <?php if ($allID != '') { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $allID ?>">
                                     <?php } else { ?>
                                         <input class="form-control input-sm " name="media_id" id="media_id" type="hidden"  value="<?= $allID ?>">
 
-<?php } ?>
+                                    <?php } ?>
 
                                     <p class="help-block"></p>
                                     <div id="table_media_list"></div>
@@ -125,6 +137,15 @@ Alert(GetAlert('success'), 'success');
                                 <div class="col-md-2 hidden">
                                     <a href="javascript:;" onclick="showMediaList()" class="btn btn-sm btn-primary">เลือก</a>
                                 </div>
+                            </div>
+                            <div class="row da-form-row">
+                                <label class="col-md-2">รวมค่าปรับ (บาท) <span class="required">*</span></label>
+                                <div class="col-md-5">
+                                    <input class="form-control input-sm" name="totalAmt" id="totalAmt" type="text" readonly="" value="">
+
+                                    <p class="help-block"></p>
+                                </div>
+
                             </div>
 
                             <div class="row da-form-row">
@@ -171,8 +192,10 @@ Alert(GetAlert('success'), 'success');
 
                 }
             }).success(function (html) {
-
-                $('#table_media_list').html(html);
+                
+               var obj =  $.parseJSON(html)
+                $('#table_media_list').html(obj.html);
+                $('#totalAmt').val(obj.totalAmt);
             });
         }
     });

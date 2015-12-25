@@ -19,28 +19,7 @@ if ($_GET['action'] == 'delete' && is_numeric($_GET['id']) && $_GET['id'] != '')
             die();
         }
     }
-//    if (update("tb_borrow", "id = " . $_GET['id'])) {
-//        SetAlert('ลบการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//        header('location:' . ADDRESS . 'borrow');
-//        die();
-//    }
-//
-//    $data = array(
-//        "status" => 'ยกเลิกการคืน', // สถานะ
-//        "updated_at" => DATE_TIME, //วันที่แก้ไข
-//    );
-//
-//    if (update("tb_borrow", $data, "id = " . $_GET['id'])) {
-//
-//        $data2 = array(
-//            "status" => 'ยกเลิกการคืน', // สถานะ
-//        );
-//        if (update("tb_borrow_list", $data2, "borrow_id in(" . $_GET['id'] . ")")) {
-//            SetAlert('ยกเลิกการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//            header('location:' . ADDRESS . 'borrow');
-//            die();
-//        }
-//    }
+
 }
 //ยกเลิกการคืน(ที่ละหลายแถว)
 if (isset($_POST['select_all'])) {
@@ -51,22 +30,7 @@ if (isset($_POST['select_all'])) {
         header('location:' . ADDRESS . 'borrow');
         die();
     }
-//    $data = array(
-//        "status" => 'ยกเลิกการคืน', // สถานะ
-//        "updated_at" => DATE_TIME, //วันที่แก้ไข
-//    );
-//    if (update("tb_borrow", $data, "id in(" . $all_id . ")")) {
-//        $data2 = array(
-//            "status" => 'ยกเลิกการคืน', // สถานะ
-//        );
-//        if (update("tb_borrow_list", $data2, "borrow_id in(" . $all_id . ")")) {
-//
-//            SetAlert('ยกเลิกการคืนสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-//            header('location:' . ADDRESS . 'borrow');
-//
-//            die();
-//        }
-//    }
+
 }
 
 // แสดงการแจ้งเตือน

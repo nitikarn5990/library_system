@@ -115,6 +115,9 @@ Alert(GetAlert('success'), 'success');
                                             if ($row['status'] == 'ยกเลิกการจอง') {
                                                 $classStatus = 'danger';
                                             }
+                                            if ($row['status'] == 'จองอยู่') {
+                                                $classStatus = 'warning';
+                                            }
                                             ?>
                                             <tr class="<?= $classStatus ?>" >
                                                 <td class="center"> <input type="checkbox" name="select_all[]" class="checkboxes" value="<?= $row['id'] ?>" onclick="countSelect()"></td>
