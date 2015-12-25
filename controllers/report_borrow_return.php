@@ -41,7 +41,8 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            ข้อมูลการยืมทั้งหมด
+              <a href="<?=ADDRESS?>report_type">รายงาน</a>
+            รายงานสรุปการใช้งานยืม/คืน ตามระยะเวลา
         </p>
     </div>
 </div>
@@ -116,6 +117,8 @@ Alert(GetAlert('success'), 'success');
                                     } else {
                                         $sql = "SELECT * FROM tb_borrow_list WHERE borrow_date !='0000-00-00' AND return_date !='0000-00-00'  ORDER BY media_id DESC";
                                     }
+                                    
+                                   
                             
                                     $result = mysql_query($sql);
 

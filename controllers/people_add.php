@@ -131,7 +131,8 @@ Alert(GetAlert('success'), 'success');
         rules: {
             id_card: {
                 required: true,
-                number: true
+                number: true,
+                 rangelength: [13, 13]
             },
             first_name: {
                 required: true

@@ -1,4 +1,9 @@
 <?php
+
+if ($_SESSION['group'] != 'admin') {
+    echo "<h1>ไม่พบหน้าที่คุณต้องการ</h1>";
+    die();
+}
 //ตรวจสอบถ้ามีการลบข้อมูล (ลบที่ละแถว)
 if ($_GET['action'] == 'del' && is_numeric($_GET['id']) && $_GET['id'] != '') {
 

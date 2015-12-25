@@ -2,9 +2,7 @@
     <div class="sidebar-nav navbar-collapse">
         <ul class="nav" id="side-menu">
 
-            <li>
-                <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> หน้าแรก</a>
-            </li>
+           
             <li>
                   <a href="<?=ADDRESS?>people" class="<?= substr($_GET['controllers'], 0,6) == 'people' ? 'active':''?>"><i class="fa fa-table fa-fw"></i> ข้อมูลประชาชนที่มาใช้บริการ</a>
             </li>
@@ -24,9 +22,11 @@
             <li>
                 <a href="<?=ADDRESS?>return" class="<?= substr($_GET['controllers'], 0,6) == 'return' ? 'active':''?>"><i class="fa fa-table fa-fw"></i> ข้อมูลการคืน</a>
             </li>
+            <?php if($_SESSION['group'] == 'admin'){?>
             <li >
                 <a href="<?=ADDRESS?>staff" class="<?= substr($_GET['controllers'], 0,5) == 'staff' ? 'active':''?>"><i class="fa fa-table fa-fw "></i> ข้อมูลเจ้าหน้าที่</a>
             </li>
+            <?php }?>
             <li>
                 <a href="<?=ADDRESS?>agent" class="<?= substr($_GET['controllers'], 0,5) == 'agent' ? 'active':''?>"> <i class="fa fa-table fa-fw"></i> ข้อมูลตัวแทนจำหน่าย</a>
             </li>

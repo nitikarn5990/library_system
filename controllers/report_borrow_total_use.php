@@ -41,7 +41,8 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            ข้อมูลการยืมทั้งหมด
+            <a href="<?=ADDRESS?>report_type">รายงาน</a>
+            รายงานจำนวนการใช้งานของแต่ละประเภท
         </p>
     </div>
 </div>

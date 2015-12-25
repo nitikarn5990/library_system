@@ -97,7 +97,11 @@ if ($_SESSION ['user_id'] != "") {
 
                 <ul class="nav navbar-top-links navbar-right">
                     <li class="dropdown">
-                        <a class="dropdown-toggle"  href="<?= ADDRESS . 'staff_edit&id=' . $_SESSION['user_id'] ?>&action=repassword">
+                        <?php if($_SESSION['group'] == 'admin'){?>
+                           <a class="dropdown-toggle"  href="<?= ADDRESS . 'staff_edit' ?>&action=repassword">
+                        <?php }else{?>
+                                <a class="dropdown-toggle"  href="<?= ADDRESS . 'staff_edit&id=' . $_SESSION['user_id'] ?>&action=repassword">
+                          <?php }?>       
                             <i class="fa fa-user fa-fw"></i> 
                             <?php
                             if ($_SESSION['group'] == 'admin') {

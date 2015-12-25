@@ -41,7 +41,8 @@ Alert(GetAlert('success'), 'success');
 <div class="row">
     <div class="col-lg-12">
         <p id="breadcrumb">
-            ข้อมูลการยืมทั้งหมด
+              <a href="<?=ADDRESS?>report_type">รายงาน</a>
+            รายงานการยืมสื่อทัศนวัสดุตามช่วงเวลา
         </p>
     </div>
 </div>

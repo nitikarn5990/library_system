@@ -5,30 +5,47 @@
 
 if ($_POST['btn_submit'] == 'บันทึกข้อมูล') { //เช็คว่ามีการกดปุ่ม บันทึกข้อมูล
     //ทำการอัพเดรต ส่วนแรกคือชื่อฟิลล์ในฐานข้อมูล ส่วนที่สองคือ POST ที่มาจากฟอร์ม (จับคู่ให้ตรงกัน)
-    $data = array(
-        "first_name" => $_POST['first_name'],
-        "last_name" => $_POST['last_name'],
-        "position" => $_POST['position'],
-        "address" => $_POST['address'],
-        "email" => $_POST['email'],
-        "tel" => $_POST["tel"],
-        "password" => $_POST['password'],
-        "updated_at" => DATE_TIME, //วันที่แก้ไข
-    );
+    if ( $_SESSION['group'] == 'admin') {
+        $data = array(
+            "first_name" => $_POST['first_name'],
+            "last_name" => $_POST['last_name'],
+            "position" => $_POST['position'],
+            "address" => $_POST['address'],
+            "email" => $_POST['email'],
+            "tel" => $_POST["tel"],
+            "password" => $_POST['password'],
+            "updated_at" => DATE_TIME, //วันที่แก้ไข
+        );
+    } else {
+        $data = array(
+            "first_name" => $_POST['first_name'],
+            "last_name" => $_POST['last_name'],
+            "position" => $_POST['position'],
+            "address" => $_POST['address'],
+            "email" => $_POST['email'],
+            "tel" => $_POST["tel"],
+        
+            "updated_at" => DATE_TIME, //วันที่แก้ไข
+        );
+    }
+
 
 // update ข้อมูลลงในตาราง tb_staff โดยฃื่อฟิลด์ และค่าตามตัวแปร array ชื่อ $data
-    if (update("tb_staff", $data, "id = " . $_GET['id'])) { //ชื่อตาราง,ข้อมูลจากตัวแปร $data,id ที่จะทำการแก้ไข
+
+    $user_id = $_GET['id'] == '' ? $_SESSION['user_id'] : $_GET['id'];
+    if (update("tb_staff", $data, "id = " . $user_id)) { //ชื่อตาราง,ข้อมูลจากตัวแปร $data,id ที่จะทำการแก้ไข
         //  echo AlertSuccess;
         SetAlert('เพิ่ม แก้ไข ข้อมูลสำเร็จ', 'success'); //แสดงข้อมูลแจ้งเตือนถ้าสำเร็จ
-      
-     //   header('location:' . ADDRESS . 'staff_edit&id=' . $_POST['id'] . $_POST['action'] != '' ? '&action=repassword':''); //กลับยังหน้าแสดงข้อมูล staff ทั้งหมด
-     //   die();
+        //   header('location:' . ADDRESS . 'staff_edit&id=' . $_POST['id'] . $_POST['action'] != '' ? '&action=repassword':''); //กลับยังหน้าแสดงข้อมูล staff ทั้งหมด
+        //   die();
     } else {
-        SetAlert('เกิดข้อผิดพลาดไม่สามารถเพิ่มข้อมูลได้'); //แสดงข้อมูลแจ้งเตือนถ้าไม่สำเร็จ
+        SetAlert('เกิดข้อผิดพลาดไม่สามารถแก้ไขข้อมูลได้'); //แสดงข้อมูลแจ้งเตือนถ้าไม่สำเร็จ
         header('location:' . ADDRESS . 'staff_edit');
         die();
     }
 }
+
+
 
 //เช็คค่า id ต้องมีค่า และ ไม่เป็นค่าว่าง และ ต้องเป็นตัวเลขเท่านั้น
 if (isset($_GET['id']) && $_GET['id'] != '' && is_numeric($_GET['id'])) {
@@ -40,8 +57,16 @@ if (isset($_GET['id']) && $_GET['id'] != '' && is_numeric($_GET['id'])) {
     if ($num_row == 1) {
         $row = mysql_fetch_assoc($result);
     }
-    
-  
+} else {
+    if ($_SESSION['group'] == 'admin') {
+
+        $sql = "SELECT * FROM tb_staff WHERE id = " . $_SESSION['user_id'];
+        $result = mysql_query($sql);
+        $num_row = mysql_num_rows($result);
+        if ($num_row == 1) {
+            $row = mysql_fetch_assoc($result);
+        }
+    }
 }
 ?>
 <?php
@@ -62,7 +87,7 @@ Alert(GetAlert('success'), 'success');
                     echo "เปลี่ยนรหัสผ่าน";
                     $uri_action = '&action=repassword';
                 } else {
-                    echo "เพิ่มข้อมูลเจ้าหน้าที่";
+                    echo "แก้ไขข้อมูลเจ้าหน้าที่";
                 }
             } else {
                 echo "ข้อมูลส่วนตัว";
@@ -76,15 +101,20 @@ Alert(GetAlert('success'), 'success');
 </div>
 <div class="row">
     <div class="col-lg-12">
-        <?php if ($_GET['action'] == 'repassword') { ?>
+        <?php if ($_GET['id'] == '') { ?>
             <p id="breadcrumb">
 
                 เปลี่ยนรหัสผ่าน
             </p>
         <?php } else { ?>
             <p id="breadcrumb">
-                <a href="<?= ADDRESS ?>staff">ข้อมูลพนักงานทั้งหมด</a>
-                เพิ่มข้อมูลเจ้าหน้าที่
+                <?php if ($_SESSION['group'] == 'staff') { ?>
+                    แก้ไขข้อมูลเจ้าหน้าที่
+                <?php } else { ?>
+                    <a href="<?= ADDRESS ?>staff">ข้อมูลพนักงานทั้งหมด</a>
+                    แก้ไขข้อมูลเจ้าหน้าที่
+                <?php } ?>
+
             </p>
         <?php } ?>
 
@@ -102,7 +132,7 @@ Alert(GetAlert('success'), 'success');
                         echo "เปลี่ยนรหัสผ่าน";
                     } else {
                         echo "<i class=icol-add></i> ";
-                        echo "เพิ่มข้อมูลเจ้าหน้าที่";
+                        echo "แก้ไขข้อมูลเจ้าหน้าที่";
                     }
                 } else {
                     echo "<i class='fa fa-pencil-square-o'></i> ";
@@ -114,10 +144,10 @@ Alert(GetAlert('success'), 'success');
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <form role="form" action="<?= ADDRESS ?>staff_edit&id=<?= $_GET['id'] ?><?= isset($uri_action)?$uri_action:''?>" method="POST">
-                            <input type="hidden" name="action" value="<?=isset($_GET['action']) ? $_GET['action']:'' ?>">     
-                            <input type="hidden" name="id" value="<?=isset($_GET['id']) ? $_GET['id']:'' ?>">    
-                             <?php if ($_GET['action'] != 'repassword') { ?>    
+                        <form role="form" action="<?= ADDRESS ?>staff_edit&id=<?= $_GET['id'] ?><?= isset($uri_action) ? $uri_action : '' ?>" method="POST">
+                            <input type="hidden" name="action" value="<?= isset($_GET['action']) ? $_GET['action'] : '' ?>">     
+                            <input type="hidden" name="id" value="<?= isset($_GET['id']) ? $_GET['id'] : '' ?>">    
+                            <?php if ($_GET['id'] != '') { ?>    
                                 <div class="row da-form-row">
                                     <label class="col-md-2">ชื่อ <span class="required">*</span></label>
                                     <div class="col-md-10">
@@ -160,29 +190,29 @@ Alert(GetAlert('success'), 'success');
                                         <p class="help-block"></p>
                                     </div>
                                 </div>
-                              <?php } ?>
-                             <?php if ($_SESSION['group'] == 'admin') { ?>          
-                            
-                            <div class="row">
-                                <div class="panel-toolbar" style="padding: 5px 15px 0 15px;">
-                                    <label class=""><i class="fa fa-key"></i><strong>  สำหรับเข้าใช้งาน</strong></label>
+                            <?php } ?>
+                            <?php if ($_SESSION['group'] == 'admin') { ?>          
+
+                                <div class="row">
+                                    <div class="panel-toolbar" style="padding: 5px 15px 0 15px;">
+                                        <label class=""><i class="fa fa-key"></i><strong>  สำหรับเข้าใช้งาน</strong></label>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div class="row  da-form-row">
-                                <label class="col-md-2">Username <span class="required">*</span></label>
-                                <div class="col-md-10">
-                                    <input class="form-control input-sm" type="text" name="username" value="<?= isset($row['username']) ? $row['username'] : '' ?>" disabled="">
-                                    <p class="help-block"></p>
+
+                                <div class="row  da-form-row">
+                                    <label class="col-md-2">Username <span class="required">*</span></label>
+                                    <div class="col-md-10">
+                                        <input class="form-control input-sm" type="text" name="username" value="<?= isset($row['username']) ? $row['username'] : '' ?>" disabled="">
+                                        <p class="help-block"></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row  da-form-row">
-                                <label class="col-md-2">Password <span class="required">*</span></label>
-                                <div class="col-md-10">
-                                    <input class="form-control input-sm" type="text" name="password" value="<?= isset($row['password']) ? $row['password'] : '' ?>">
-                                    <p class="help-block">ไม่ต่ำกว่า 6 ตัวอักษร</p>
+                                <div class="row  da-form-row">
+                                    <label class="col-md-2">Password <span class="required">*</span></label>
+                                    <div class="col-md-10">
+                                        <input class="form-control input-sm" type="text" name="password" value="<?= isset($row['password']) ? $row['password'] : '' ?>">
+                                        <p class="help-block">ไม่ต่ำกว่า 6 ตัวอักษร</p>
+                                    </div>
                                 </div>
-                            </div>
                             <?php } ?>
                             <div class="row ">
                                 <div class="">
